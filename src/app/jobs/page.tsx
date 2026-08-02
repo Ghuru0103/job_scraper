@@ -93,6 +93,14 @@ function JobsContent() {
 
   const sources = Array.from(new Set([...ALL_SOURCES, ...jobs.map((j) => j.source)]));
 
+  const handleExportCSV = () => {
+    const params = new URLSearchParams();
+    if (sourceFilter) params.set('source', sourceFilter);
+    if (remoteOnly) params.set('remote', 'true');
+    if (search) params.set('company', search);
+    window.open(`/api/jobs/export?${params.toString()}`, '_blank');
+  };
+
   return (
     <div style={{ minHeight: '100vh' }}>
       <Navbar />
@@ -109,23 +117,40 @@ function JobsContent() {
             </p>
           </div>
 
-          {/* View toggle */}
-          <div style={{ display: 'flex', gap: '0.375rem', padding: '0.25rem', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-            {(['grid', 'table'] as const).map((mode) => (
-              <button
-                key={mode}
-                className="btn btn-sm"
-                style={{
-                  background: viewMode === mode ? 'var(--gradient-primary)' : 'transparent',
-                  color: viewMode === mode ? 'white' : 'var(--text-muted)',
-                  border: 'none',
-                  padding: '0.375rem 0.75rem',
-                }}
-                onClick={() => setViewMode(mode)}
-              >
-                {mode === 'grid' ? '⊞' : '☰'}
-              </button>
-            ))}
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Export CSV button */}
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={handleExportCSV}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                fontWeight: 600,
+                borderColor: 'var(--border-subtle)',
+              }}
+            >
+              📥 Export CSV
+            </button>
+
+            {/* View toggle */}
+            <div style={{ display: 'flex', gap: '0.375rem', padding: '0.25rem', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+              {(['grid', 'table'] as const).map((mode) => (
+                <button
+                  key={mode}
+                  className="btn btn-sm"
+                  style={{
+                    background: viewMode === mode ? 'var(--gradient-primary)' : 'transparent',
+                    color: viewMode === mode ? 'white' : 'var(--text-muted)',
+                    border: 'none',
+                    padding: '0.375rem 0.75rem',
+                  }}
+                  onClick={() => setViewMode(mode)}
+                >
+                  {mode === 'grid' ? '⊞' : '☰'}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
