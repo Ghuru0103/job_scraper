@@ -50035,14 +50035,14 @@ StoreComponent = __decorateClass([
     template: `
     <div style="min-height: 100vh;">
       <!-- Hero -->
-      <section className="grid-bg" style="padding: 4rem 0 3rem; text-align: center; position: relative;">
-        <div className="container">
+      <section class="grid-bg" style="padding: 4rem 0 3rem; text-align: center; position: relative;">
+        <div class="container">
           <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 1rem; border-radius: var(--radius-full); background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); font-size: 0.8rem; color: #a5b4fc; font-weight: 600; margin-bottom: 1.5rem;">
             <span>\u{1F680}</span> Angular 19 + Node.js Express Architecture
           </div>
 
           <h1 style="font-size: clamp(2.25rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 1rem;">
-            <span className="text-gradient">Antigravity</span>
+            <span class="text-gradient">Antigravity</span>
             <br />
             <span style="color: var(--text-primary);">Apify Job Scraper Store</span>
           </h1>
@@ -50055,16 +50055,16 @@ StoreComponent = __decorateClass([
 
       <!-- Category Filter Bar -->
       <div style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-secondary); position: sticky; top: 64px; z-index: 40;">
-        <div className="container" style="padding: 1rem 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-          <div className="input-group" style="flex: 1; min-width: 200px; max-width: 320px;">
-            <span className="input-icon">\u{1F50D}</span>
-            <input className="input" placeholder="Search scrapers..." [(ngModel)]="searchQuery" (input)="filterActors()" />
+        <div class="container" style="padding: 1rem 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+          <div class="input-group" style="flex: 1; min-width: 200px; max-width: 320px;">
+            <span class="input-icon">\u{1F50D}</span>
+            <input class="input" placeholder="Search scrapers..." [(ngModel)]="searchQuery" (input)="filterActors()" />
           </div>
 
           <div style="display: flex; gap: 0.375rem; flex-wrap: wrap; flex: 1;">
             <button
               *ngFor="let cat of categories"
-              className="btn btn-sm"
+              class="btn btn-sm"
               [style.background]="selectedCategory === cat.id ? 'var(--gradient-primary)' : 'var(--bg-card)'"
               [style.color]="selectedCategory === cat.id ? 'white' : 'var(--text-secondary)'"
               (click)="selectCategory(cat.id)"
@@ -50076,13 +50076,13 @@ StoreComponent = __decorateClass([
       </div>
 
       <!-- Scrapers Catalog Grid -->
-      <main className="container" style="padding: 2.5rem 1.5rem;">
+      <main class="container" style="padding: 2.5rem 1.5rem;">
         <div *ngIf="loading" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
-          <div *ngFor="let item of [1,2,3,4,5,6]" className="skeleton" style="height: 320px; border-radius: var(--radius-lg);"></div>
+          <div *ngFor="let item of [1,2,3,4,5,6]" class="skeleton" style="height: 320px; border-radius: var(--radius-lg);"></div>
         </div>
 
         <div *ngIf="!loading" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
-          <div *ngFor="let actor of filteredActors" className="card animate-fade-in" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div *ngFor="let actor of filteredActors" class="card animate-fade-in" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                 <div style="display: flex; gap: 0.875rem; align-items: center;">
@@ -50093,7 +50093,7 @@ StoreComponent = __decorateClass([
                     <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0;">
                       {{ actor.title }}
                     </h3>
-                    <span className="badge badge-purple" style="margin-top: 0.25rem;">{{ actor.category }}</span>
+                    <span class="badge badge-purple" style="margin-top: 0.25rem;">{{ actor.category }}</span>
                   </div>
                 </div>
               </div>
@@ -50103,7 +50103,7 @@ StoreComponent = __decorateClass([
               </p>
 
               <div style="display: flex; gap: 0.375rem; flex-wrap: wrap; margin-bottom: 1rem;">
-                <span *ngFor="let tag of actor.tags.slice(0, 3)" className="tag">{{ tag }}</span>
+                <span *ngFor="let tag of actor.tags.slice(0, 3)" class="tag">{{ tag }}</span>
               </div>
             </div>
 
@@ -50121,7 +50121,7 @@ StoreComponent = __decorateClass([
               </div>
 
               <button
-                className="btn btn-primary"
+                class="btn btn-primary"
                 style="width: 100%;"
                 [disabled]="runningMap[actor.actorId]"
                 (click)="triggerRun(actor)"
@@ -50217,7 +50217,7 @@ JobsComponent = __decorateClass([
     imports: [CommonModule, FormsModule],
     template: `
     <div style="min-height: 100vh;">
-      <main className="container" style="padding: 2rem 1.5rem;">
+      <main class="container" style="padding: 2rem 1.5rem;">
         <!-- Header & CSV Export Controls -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
@@ -50231,44 +50231,44 @@ JobsComponent = __decorateClass([
 
           <!-- CSV Export Button with Dropdown -->
           <div style="position: relative;">
-            <button className="btn btn-secondary btn-sm" (click)="toggleExportMenu()" style="font-weight: 600;">
+            <button class="btn btn-secondary btn-sm" (click)="toggleExportMenu()" style="font-weight: 600;">
               \u{1F4E5} Export CSV \u25BE
             </button>
 
-            <div *ngIf="showExportMenu" className="animate-fade-in" style="position: absolute; top: calc(100% + 0.5rem); right: 0; width: 240px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; padding: 0.5rem 0;">
+            <div *ngIf="showExportMenu" class="animate-fade-in" style="position: absolute; top: calc(100% + 0.5rem); right: 0; width: 240px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; padding: 0.5rem 0;">
               <div style="padding: 0.375rem 0.75rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
                 Export Options
               </div>
-              <button className="export-item" (click)="exportCSV('')" style="color: var(--accent-primary); font-weight: 600;">
+              <button class="export-item" (click)="exportCSV('')" style="color: var(--accent-primary); font-weight: 600;">
                 \u{1F4E6} Combined List (All Platforms)
               </button>
               <div style="height: 1px; background: var(--border-subtle); margin: 0.375rem 0;"></div>
               <div style="padding: 0.25rem 0.75rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
                 Platform Specific CSV
               </div>
-              <button className="export-item" (click)="exportCSV('linkedin-jobs')">\u{1F4BC} LinkedIn Jobs CSV</button>
-              <button className="export-item" (click)="exportCSV('naukri-scraper')">\u{1F1EE}\u{1F1F3} Naukri Jobs CSV</button>
-              <button className="export-item" (click)="exportCSV('indeed-scraper')">\u{1F50D} Indeed Jobs CSV</button>
-              <button className="export-item" (click)="exportCSV('glassdoor-scraper')">\u{1F3E2} Glassdoor Jobs CSV</button>
-              <button className="export-item" (click)="exportCSV('remote-ok-scraper')">\u{1F30D} Remote OK CSV</button>
-              <button className="export-item" (click)="exportCSV('upwork-scraper')">\u{1F4BB} Upwork Freelance CSV</button>
+              <button class="export-item" (click)="exportCSV('linkedin-jobs')">\u{1F4BC} LinkedIn Jobs CSV</button>
+              <button class="export-item" (click)="exportCSV('naukri-scraper')">\u{1F1EE}\u{1F1F3} Naukri Jobs CSV</button>
+              <button class="export-item" (click)="exportCSV('indeed-scraper')">\u{1F50D} Indeed Jobs CSV</button>
+              <button class="export-item" (click)="exportCSV('glassdoor-scraper')">\u{1F3E2} Glassdoor Jobs CSV</button>
+              <button class="export-item" (click)="exportCSV('remote-ok-scraper')">\u{1F30D} Remote OK CSV</button>
+              <button class="export-item" (click)="exportCSV('upwork-scraper')">\u{1F4BB} Upwork Freelance CSV</button>
             </div>
           </div>
         </div>
 
         <!-- Filter Controls Suite -->
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 1.25rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); align-items: center;">
-          <div className="input-group" style="flex: 1; min-width: 180px;">
-            <span className="input-icon">\u{1F3E2}</span>
-            <input className="input" placeholder="Filter company..." [(ngModel)]="searchCompany" (input)="fetchJobs()" />
+          <div class="input-group" style="flex: 1; min-width: 180px;">
+            <span class="input-icon">\u{1F3E2}</span>
+            <input class="input" placeholder="Filter company..." [(ngModel)]="searchCompany" (input)="fetchJobs()" />
           </div>
 
-          <div className="input-group" style="flex: 1; min-width: 180px;">
-            <span className="input-icon">\u{1F4CD}</span>
-            <input className="input" placeholder="Filter location..." [(ngModel)]="searchLocation" (input)="fetchJobs()" />
+          <div class="input-group" style="flex: 1; min-width: 180px;">
+            <span class="input-icon">\u{1F4CD}</span>
+            <input class="input" placeholder="Filter location..." [(ngModel)]="searchLocation" (input)="fetchJobs()" />
           </div>
 
-          <select className="input" style="min-width: 140px;" [(ngModel)]="experienceFilter" (change)="fetchJobs()">
+          <select class="input" style="min-width: 140px;" [(ngModel)]="experienceFilter" (change)="fetchJobs()">
             <option value="">Any Experience</option>
             <option value="entry">\u{1F331} Entry Level (0-2 yrs)</option>
             <option value="mid">\u{1F33F} Mid Level (2-5 yrs)</option>
@@ -50276,7 +50276,7 @@ JobsComponent = __decorateClass([
             <option value="lead">\u{1F680} Lead / Executive</option>
           </select>
 
-          <select className="input" style="min-width: 140px;" [(ngModel)]="minSalaryFilter" (change)="fetchJobs()">
+          <select class="input" style="min-width: 140px;" [(ngModel)]="minSalaryFilter" (change)="fetchJobs()">
             <option value="">Any Salary</option>
             <option value="60000">\u{1F4B0} $60k+ / yr</option>
             <option value="80000">\u{1F4B0} $80k+ / yr</option>
@@ -50286,7 +50286,7 @@ JobsComponent = __decorateClass([
           </select>
 
           <!-- Posted Date Select -->
-          <select className="input" style="min-width: 140px;" [(ngModel)]="postedFilter" (change)="fetchJobs()">
+          <select class="input" style="min-width: 140px;" [(ngModel)]="postedFilter" (change)="fetchJobs()">
             <option value="">Any Time</option>
             <option value="1">\u23F1 Last 1 day</option>
             <option value="3">\u23F1 Last 3 days</option>
@@ -50296,7 +50296,7 @@ JobsComponent = __decorateClass([
           </select>
 
           <button
-            className="btn btn-sm"
+            class="btn btn-sm"
             [style.background]="remoteOnly ? 'rgba(16,185,129,0.15)' : 'var(--bg-elevated)'"
             [style.color]="remoteOnly ? 'var(--accent-green)' : 'var(--text-secondary)'"
             (click)="toggleRemote()"
@@ -50304,22 +50304,22 @@ JobsComponent = __decorateClass([
             \u{1F30D} Remote Only
           </button>
 
-          <button *ngIf="hasActiveFilters()" className="btn btn-ghost btn-sm" (click)="clearFilters()" style="color: var(--accent-red);">
+          <button *ngIf="hasActiveFilters()" class="btn btn-ghost btn-sm" (click)="clearFilters()" style="color: var(--accent-red);">
             \u2715 Clear Filters
           </button>
         </div>
 
         <!-- Jobs Grid -->
         <div *ngIf="loading" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
-          <div *ngFor="let i of [1,2,3,4,5,6]" className="skeleton" style="height: 200px; border-radius: var(--radius-lg);"></div>
+          <div *ngFor="let i of [1,2,3,4,5,6]" class="skeleton" style="height: 200px; border-radius: var(--radius-lg);"></div>
         </div>
 
         <div *ngIf="!loading" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
-          <div *ngFor="let job of jobs" className="card animate-fade-in" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div *ngFor="let job of jobs" class="card animate-fade-in" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
               <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                <span className="badge badge-purple">{{ job.source }}</span>
-                <span *ngIf="job.remote" className="badge badge-green">Remote</span>
+                <span class="badge badge-purple">{{ job.source }}</span>
+                <span *ngIf="job.remote" class="badge badge-green">Remote</span>
               </div>
 
               <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0.25rem 0 0.5rem;">
@@ -50335,11 +50335,11 @@ JobsComponent = __decorateClass([
               </div>
 
               <div style="display: flex; gap: 0.375rem; flex-wrap: wrap; margin-bottom: 1rem;">
-                <span *ngFor="let skill of job.skills || []" className="tag">{{ skill }}</span>
+                <span *ngFor="let skill of job.skills || []" class="tag">{{ skill }}</span>
               </div>
             </div>
 
-            <a [href]="job.url" target="_blank" className="btn btn-secondary btn-sm" style="text-align: center; text-decoration: none; display: block;">
+            <a [href]="job.url" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="text-align: center; text-decoration: none; display: block;">
               Apply / View Listing \u2197
             </a>
           </div>
@@ -50413,7 +50413,7 @@ RunsComponent = __decorateClass([
     imports: [CommonModule],
     template: `
     <div style="min-height: 100vh;">
-      <main className="container" style="padding: 2rem 1.5rem;">
+      <main class="container" style="padding: 2rem 1.5rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
           <div>
             <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">
@@ -50423,19 +50423,19 @@ RunsComponent = __decorateClass([
               Monitor live scraping execution, view input parameters, inspect output results, or purge runs.
             </p>
           </div>
-          <button className="btn btn-secondary btn-sm" (click)="fetchRuns()">\u{1F504} Refresh</button>
+          <button class="btn btn-secondary btn-sm" (click)="fetchRuns()">\u{1F504} Refresh</button>
         </div>
 
         <div *ngIf="loading" style="display: flex; flex-direction: column; gap: 1rem;">
-          <div *ngFor="let i of [1,2,3]" className="skeleton" style="height: 120px; border-radius: var(--radius-lg);"></div>
+          <div *ngFor="let i of [1,2,3]" class="skeleton" style="height: 120px; border-radius: var(--radius-lg);"></div>
         </div>
 
         <div *ngIf="!loading" style="display: flex; flex-direction: column; gap: 1rem;">
-          <div *ngFor="let run of runs" className="card animate-fade-in" style="padding: 1.25rem;">
+          <div *ngFor="let run of runs" class="card animate-fade-in" style="padding: 1.25rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
               <div>
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.375rem;">
-                  <span [className]="getStatusBadge(run.status)">{{ run.status }}</span>
+                  <span [class]="getStatusBadge(run.status)">{{ run.status }}</span>
                   <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0;">
                     {{ run.actorName || run.actorId }}
                   </h3>
@@ -50446,20 +50446,20 @@ RunsComponent = __decorateClass([
               </div>
 
               <div style="display: flex; gap: 0.5rem; align-items: center;">
-                <a [href]="'/jobs?runId=' + run._id" className="btn btn-primary btn-sm" style="text-decoration: none;">
+                <a [href]="'/jobs?runId=' + run._id" class="btn btn-primary btn-sm" style="text-decoration: none;">
                   \u{1F4BC} View Results ({{ run.output?.resultsCount || 0 }})
                 </a>
-                <button className="btn btn-secondary btn-sm" (click)="toggleDetails(run._id)">
+                <button class="btn btn-secondary btn-sm" (click)="toggleDetails(run._id)">
                   \u{1F441} Details
                 </button>
-                <button className="btn btn-ghost btn-sm" (click)="deleteRun(run._id)" style="color: var(--accent-red);">
+                <button class="btn btn-ghost btn-sm" (click)="deleteRun(run._id)" style="color: var(--accent-red);">
                   \u{1F5D1} Delete
                 </button>
               </div>
             </div>
 
             <!-- Details Panel -->
-            <div *ngIf="expandedId === run._id" className="animate-fade-in" style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div *ngIf="expandedId === run._id" class="animate-fade-in" style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div>
                   <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.375rem;">
@@ -50502,7 +50502,7 @@ DashboardComponent = __decorateClass([
     imports: [CommonModule],
     template: `
     <div style="min-height: 100vh;">
-      <main className="container" style="padding: 2rem 1.5rem;">
+      <main class="container" style="padding: 2rem 1.5rem;">
         <div style="margin-bottom: 1.5rem;">
           <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">
             \u{1F4CA} Scraper Analytics Dashboard
@@ -50513,32 +50513,32 @@ DashboardComponent = __decorateClass([
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-          <div className="card" style="padding: 1.25rem; text-align: center;">
+          <div class="card" style="padding: 1.25rem; text-align: center;">
             <div style="font-size: 2rem; font-weight: 800; color: var(--accent-primary);">{{ stats?.overview?.totalRuns || 0 }}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">Total Runs Triggered</div>
           </div>
-          <div className="card" style="padding: 1.25rem; text-align: center;">
+          <div class="card" style="padding: 1.25rem; text-align: center;">
             <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green);">{{ stats?.overview?.totalJobs || 0 }}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">Total Jobs Scraped</div>
           </div>
-          <div className="card" style="padding: 1.25rem; text-align: center;">
+          <div class="card" style="padding: 1.25rem; text-align: center;">
             <div style="font-size: 2rem; font-weight: 800; color: var(--accent-tertiary);">{{ stats?.overview?.activeActors || 0 }}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">Active Scraper Actors</div>
           </div>
-          <div className="card" style="padding: 1.25rem; text-align: center;">
+          <div class="card" style="padding: 1.25rem; text-align: center;">
             <div style="font-size: 2rem; font-weight: 800; color: #f59e0b;">\${{ stats?.overview?.totalCostUsd || '0.00' }}</div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">Est. Compute Cost</div>
           </div>
         </div>
 
-        <div className="card" style="padding: 1.5rem;">
+        <div class="card" style="padding: 1.5rem;">
           <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">
             \u{1F4C8} Scraped Distribution by Job Source
           </h3>
           <div style="display: flex; flex-direction: column; gap: 0.75rem;">
             <div *ngFor="let item of stats?.charts?.jobsBySource || []" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--bg-secondary); border-radius: var(--radius-md);">
               <span style="font-weight: 600; color: var(--text-primary);">{{ item._id }}</span>
-              <span className="badge badge-purple" style="font-size: 0.85rem;">{{ item.count }} Jobs</span>
+              <span class="badge badge-purple" style="font-size: 0.85rem;">{{ item.count }} Jobs</span>
             </div>
           </div>
         </div>
@@ -50571,7 +50571,7 @@ MonitoringComponent = __decorateClass([
     imports: [CommonModule],
     template: `
     <div style="min-height: 100vh;">
-      <main className="container" style="padding: 2rem 1.5rem;">
+      <main class="container" style="padding: 2rem 1.5rem;">
         <div style="margin-bottom: 1.5rem;">
           <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">
             \u{1F7E2} System Health & Prometheus Metrics
@@ -50582,7 +50582,7 @@ MonitoringComponent = __decorateClass([
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-          <div className="card" style="padding: 1.5rem;">
+          <div class="card" style="padding: 1.5rem;">
             <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">
               \u{1F343} MongoDB Connection Status
             </h3>
@@ -50597,7 +50597,7 @@ MonitoringComponent = __decorateClass([
             </p>
           </div>
 
-          <div className="card" style="padding: 1.5rem;">
+          <div class="card" style="padding: 1.5rem;">
             <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">
               \u26A1 Redis Cache Status
             </h3>
@@ -50613,12 +50613,12 @@ MonitoringComponent = __decorateClass([
           </div>
         </div>
 
-        <div className="card" style="padding: 1.5rem;">
+        <div class="card" style="padding: 1.5rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0;">
               \u{1F4CA} Live Prometheus Metrics Stream (/api/metrics)
             </h3>
-            <a href="/api/metrics" target="_blank" className="btn btn-secondary btn-sm" style="text-decoration: none;">
+            <a href="/api/metrics" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="text-decoration: none;">
               Open Raw Stream \u2197
             </a>
           </div>

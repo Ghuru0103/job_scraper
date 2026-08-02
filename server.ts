@@ -542,7 +542,16 @@ app.get('/api/jobs', async (req: Request, res: Response) => {
 
   try {
     await connectDB();
+    const legacyJobs = await Job.find({ url: /example\.com/i }).lean();
+    if (legacyJobs.length > 0) {
+      for (const j of legacyJobs) {
+        const realUrl = generateRealPlatformUrl(j.source || 'naukri-scraper', j.title || 'Software Engineer', j.company || 'TechCorp');
+        await Job.findByIdAndUpdate(j._id, { url: realUrl });
+      }
+    }
+
     const filter: Record<string, unknown> = { userId: '000000000000000000000001' };
+
     if (source) filter.source = source;
     if (company) filter.company = new RegExp(company, 'i');
     if (location) filter.location = new RegExp(location, 'i');

@@ -24,7 +24,7 @@ interface Job {
   imports: [CommonModule, FormsModule],
   template: `
     <div style="min-height: 100vh;">
-      <main className="container" style="padding: 2rem 1.5rem;">
+      <main class="container" style="padding: 2rem 1.5rem;">
         <!-- Header & CSV Export Controls -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
@@ -38,44 +38,44 @@ interface Job {
 
           <!-- CSV Export Button with Dropdown -->
           <div style="position: relative;">
-            <button className="btn btn-secondary btn-sm" (click)="toggleExportMenu()" style="font-weight: 600;">
+            <button class="btn btn-secondary btn-sm" (click)="toggleExportMenu()" style="font-weight: 600;">
               📥 Export CSV ▾
             </button>
 
-            <div *ngIf="showExportMenu" className="animate-fade-in" style="position: absolute; top: calc(100% + 0.5rem); right: 0; width: 240px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; padding: 0.5rem 0;">
+            <div *ngIf="showExportMenu" class="animate-fade-in" style="position: absolute; top: calc(100% + 0.5rem); right: 0; width: 240px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; padding: 0.5rem 0;">
               <div style="padding: 0.375rem 0.75rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
                 Export Options
               </div>
-              <button className="export-item" (click)="exportCSV('')" style="color: var(--accent-primary); font-weight: 600;">
+              <button class="export-item" (click)="exportCSV('')" style="color: var(--accent-primary); font-weight: 600;">
                 📦 Combined List (All Platforms)
               </button>
               <div style="height: 1px; background: var(--border-subtle); margin: 0.375rem 0;"></div>
               <div style="padding: 0.25rem 0.75rem; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
                 Platform Specific CSV
               </div>
-              <button className="export-item" (click)="exportCSV('linkedin-jobs')">💼 LinkedIn Jobs CSV</button>
-              <button className="export-item" (click)="exportCSV('naukri-scraper')">🇮🇳 Naukri Jobs CSV</button>
-              <button className="export-item" (click)="exportCSV('indeed-scraper')">🔍 Indeed Jobs CSV</button>
-              <button className="export-item" (click)="exportCSV('glassdoor-scraper')">🏢 Glassdoor Jobs CSV</button>
-              <button className="export-item" (click)="exportCSV('remote-ok-scraper')">🌍 Remote OK CSV</button>
-              <button className="export-item" (click)="exportCSV('upwork-scraper')">💻 Upwork Freelance CSV</button>
+              <button class="export-item" (click)="exportCSV('linkedin-jobs')">💼 LinkedIn Jobs CSV</button>
+              <button class="export-item" (click)="exportCSV('naukri-scraper')">🇮🇳 Naukri Jobs CSV</button>
+              <button class="export-item" (click)="exportCSV('indeed-scraper')">🔍 Indeed Jobs CSV</button>
+              <button class="export-item" (click)="exportCSV('glassdoor-scraper')">🏢 Glassdoor Jobs CSV</button>
+              <button class="export-item" (click)="exportCSV('remote-ok-scraper')">🌍 Remote OK CSV</button>
+              <button class="export-item" (click)="exportCSV('upwork-scraper')">💻 Upwork Freelance CSV</button>
             </div>
           </div>
         </div>
 
         <!-- Filter Controls Suite -->
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 1.25rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); align-items: center;">
-          <div className="input-group" style="flex: 1; min-width: 180px;">
-            <span className="input-icon">🏢</span>
-            <input className="input" placeholder="Filter company..." [(ngModel)]="searchCompany" (input)="fetchJobs()" />
+          <div class="input-group" style="flex: 1; min-width: 180px;">
+            <span class="input-icon">🏢</span>
+            <input class="input" placeholder="Filter company..." [(ngModel)]="searchCompany" (input)="fetchJobs()" />
           </div>
 
-          <div className="input-group" style="flex: 1; min-width: 180px;">
-            <span className="input-icon">📍</span>
-            <input className="input" placeholder="Filter location..." [(ngModel)]="searchLocation" (input)="fetchJobs()" />
+          <div class="input-group" style="flex: 1; min-width: 180px;">
+            <span class="input-icon">📍</span>
+            <input class="input" placeholder="Filter location..." [(ngModel)]="searchLocation" (input)="fetchJobs()" />
           </div>
 
-          <select className="input" style="min-width: 140px;" [(ngModel)]="experienceFilter" (change)="fetchJobs()">
+          <select class="input" style="min-width: 140px;" [(ngModel)]="experienceFilter" (change)="fetchJobs()">
             <option value="">Any Experience</option>
             <option value="entry">🌱 Entry Level (0-2 yrs)</option>
             <option value="mid">🌿 Mid Level (2-5 yrs)</option>
@@ -83,7 +83,7 @@ interface Job {
             <option value="lead">🚀 Lead / Executive</option>
           </select>
 
-          <select className="input" style="min-width: 140px;" [(ngModel)]="minSalaryFilter" (change)="fetchJobs()">
+          <select class="input" style="min-width: 140px;" [(ngModel)]="minSalaryFilter" (change)="fetchJobs()">
             <option value="">Any Salary</option>
             <option value="60000">💰 $60k+ / yr</option>
             <option value="80000">💰 $80k+ / yr</option>
@@ -93,7 +93,7 @@ interface Job {
           </select>
 
           <!-- Posted Date Select -->
-          <select className="input" style="min-width: 140px;" [(ngModel)]="postedFilter" (change)="fetchJobs()">
+          <select class="input" style="min-width: 140px;" [(ngModel)]="postedFilter" (change)="fetchJobs()">
             <option value="">Any Time</option>
             <option value="1">⏱ Last 1 day</option>
             <option value="3">⏱ Last 3 days</option>
@@ -103,7 +103,7 @@ interface Job {
           </select>
 
           <button
-            className="btn btn-sm"
+            class="btn btn-sm"
             [style.background]="remoteOnly ? 'rgba(16,185,129,0.15)' : 'var(--bg-elevated)'"
             [style.color]="remoteOnly ? 'var(--accent-green)' : 'var(--text-secondary)'"
             (click)="toggleRemote()"
@@ -111,22 +111,22 @@ interface Job {
             🌍 Remote Only
           </button>
 
-          <button *ngIf="hasActiveFilters()" className="btn btn-ghost btn-sm" (click)="clearFilters()" style="color: var(--accent-red);">
+          <button *ngIf="hasActiveFilters()" class="btn btn-ghost btn-sm" (click)="clearFilters()" style="color: var(--accent-red);">
             ✕ Clear Filters
           </button>
         </div>
 
         <!-- Jobs Grid -->
         <div *ngIf="loading" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
-          <div *ngFor="let i of [1,2,3,4,5,6]" className="skeleton" style="height: 200px; border-radius: var(--radius-lg);"></div>
+          <div *ngFor="let i of [1,2,3,4,5,6]" class="skeleton" style="height: 200px; border-radius: var(--radius-lg);"></div>
         </div>
 
         <div *ngIf="!loading" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
-          <div *ngFor="let job of jobs" className="card animate-fade-in" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div *ngFor="let job of jobs" class="card animate-fade-in" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
               <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                <span className="badge badge-purple">{{ job.source }}</span>
-                <span *ngIf="job.remote" className="badge badge-green">Remote</span>
+                <span class="badge badge-purple">{{ job.source }}</span>
+                <span *ngIf="job.remote" class="badge badge-green">Remote</span>
               </div>
 
               <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0.25rem 0 0.5rem;">
@@ -142,11 +142,11 @@ interface Job {
               </div>
 
               <div style="display: flex; gap: 0.375rem; flex-wrap: wrap; margin-bottom: 1rem;">
-                <span *ngFor="let skill of job.skills || []" className="tag">{{ skill }}</span>
+                <span *ngFor="let skill of job.skills || []" class="tag">{{ skill }}</span>
               </div>
             </div>
 
-            <a [href]="job.url" target="_blank" className="btn btn-secondary btn-sm" style="text-align: center; text-decoration: none; display: block;">
+            <a [href]="job.url" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="text-align: center; text-decoration: none; display: block;">
               Apply / View Listing ↗
             </a>
           </div>

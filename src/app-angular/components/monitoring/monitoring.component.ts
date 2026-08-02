@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div style="min-height: 100vh;">
-      <main className="container" style="padding: 2rem 1.5rem;">
+      <main class="container" style="padding: 2rem 1.5rem;">
         <div style="margin-bottom: 1.5rem;">
           <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;">
             🟢 System Health & Prometheus Metrics
@@ -19,7 +19,7 @@ import { CommonModule } from '@angular/common';
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-          <div className="card" style="padding: 1.5rem;">
+          <div class="card" style="padding: 1.5rem;">
             <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">
               🍃 MongoDB Connection Status
             </h3>
@@ -34,7 +34,7 @@ import { CommonModule } from '@angular/common';
             </p>
           </div>
 
-          <div className="card" style="padding: 1.5rem;">
+          <div class="card" style="padding: 1.5rem;">
             <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">
               ⚡ Redis Cache Status
             </h3>
@@ -50,12 +50,12 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
-        <div className="card" style="padding: 1.5rem;">
+        <div class="card" style="padding: 1.5rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0;">
               📊 Live Prometheus Metrics Stream (/api/metrics)
             </h3>
-            <a href="/api/metrics" target="_blank" className="btn btn-secondary btn-sm" style="text-decoration: none;">
+            <a href="/api/metrics" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="text-decoration: none;">
               Open Raw Stream ↗
             </a>
           </div>
