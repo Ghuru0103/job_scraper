@@ -218,13 +218,14 @@ export default function MonitoringPage() {
                           <span style={{ fontWeight: 600, color: 'var(--text-primary)', textTransform: 'capitalize', fontSize: '0.9rem' }}>
                             {service === 'mongodb' ? 'MongoDB' : service === 'redis' ? 'Redis' : 'Memory'}
                           </span>
-                          {check.error && (
+                          {(check as any).error && (
                             <span style={{ fontSize: '0.75rem', color: 'var(--accent-red)', fontFamily: 'JetBrains Mono, monospace' }}>
-                              {check.error}
+                              {(check as any).error}
                             </span>
                           )}
                         </div>
-                        <div style={{ display: 'flex', align: 'center', gap: '1rem', fontSize: '0.875rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.875rem' }}>
+
                           {check.latencyMs !== undefined && (
                             <span style={{ color: 'var(--text-muted)' }}>
                               {service === 'memory' ? `${check.latencyMs}MB` : `${check.latencyMs}ms`}

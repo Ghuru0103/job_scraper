@@ -412,9 +412,12 @@ export default function DashboardPage() {
                               </span>
                             </td>
                             <td style={{ fontWeight: 600, color: 'var(--accent-green)' }}>
-                              {(run as Record<string, unknown>)['output']
-                                ? ((run as Record<string, unknown>)['output'] as Record<string, unknown>)['resultsCount'] ?? '—'
-                                : '—'}
+                              {String(
+                                (run as Record<string, unknown>)['output']
+                                  ? ((run as Record<string, unknown>)['output'] as Record<string, unknown>)['resultsCount'] ?? '—'
+                                  : '—'
+                              )}
+
                             </td>
                             <td style={{ fontSize: '0.8rem' }}>
                               {new Date(run.createdAt).toLocaleString('en-US', {
