@@ -134,7 +134,7 @@ ok "Redis is ready"
 
 # ─── 8. Launch ──────────────────────────────────────────────────────────────
 echo ""
-echo -e "${BOLD}${GREEN}  🚀 All services up! Starting Next.js...${RESET}"
+echo -e "${BOLD}${GREEN}  🚀 All services up! Starting Node.js Express & Angular 19...${RESET}"
 echo ""
 echo -e "  ${BOLD}Store${RESET}       → http://localhost:3000"
 echo -e "  ${BOLD}Dashboard${RESET}   → http://localhost:3000/dashboard"

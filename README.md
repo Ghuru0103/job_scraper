@@ -1,6 +1,6 @@
 # ⚗️ Antigravity — Apify Job Scraper Store
 
-A production-grade job scraping platform built with **Next.js 16**, **MongoDB**, and **Redis**. Scrape LinkedIn, Indeed, Glassdoor, Remote OK, and 8+ job boards with proxy rotation, real-time monitoring, CSV export, and enterprise infrastructure.
+A production-grade job scraping platform built with **Angular 19+**, **Node.js (Express)**, **MongoDB**, and **Redis**. Scrape LinkedIn, Indeed, **Naukri**, Glassdoor, Remote OK, and 8+ job boards with proxy rotation, real-time monitoring, combined and platform-specific CSV export, and enterprise infrastructure.
 
 ## 🚀 Quick Start
 
@@ -8,17 +8,16 @@ A production-grade job scraping platform built with **Next.js 16**, **MongoDB**,
 ./start.sh
 ```
 
-That's it. The script auto-starts MongoDB + Redis via Docker, generates secrets, and launches the app at **http://localhost:3000**.
+That's it. The script auto-starts MongoDB + Redis via Docker, generates secrets, builds the Angular 19 frontend, and launches the Node.js Express API server at **http://localhost:3000**.
 
 ---
 
 ## 🛠 Technology Stack & Third-Party Services
 
-### 🖥️ Core Framework & Language
-- **[Next.js 16](https://nextjs.org/)** — Full-stack React framework with App Router, Turbopack, and API Routes
-- **[React 19](https://react.dev/)** — UI Component library with hooks and server client boundaries
-- **[TypeScript 5](https://www.typescriptlang.org/)** — Strict type safety across frontend and backend API endpoints
-- **[Node.js 18+](https://nodejs.org/)** — Server-side JavaScript runtime environment
+### 🖥️ Core Framework & Architecture
+- **[Angular 19+](https://angular.dev/)** — Modern Single Page Application (SPA) frontend built with Standalone Components, RxJS, Signals, and Angular Router
+- **[Node.js (Express)](https://expressjs.com/)** — Enterprise REST API server with middleware, CORS, and request tracking
+- **[TypeScript 5](https://www.typescriptlang.org/)** — Strict type safety across Angular frontend and Node.js backend endpoints
 
 ### 💾 Database, Caching & Queues
 - **[MongoDB 6.0](https://www.mongodb.com/)** — Primary document storage (3-node Replica Set supported)
@@ -28,16 +27,14 @@ That's it. The script auto-starts MongoDB + Redis via Docker, generates secrets,
 - **[Bull / BullMQ](https://docs.bullmq.io/)** — Distributed Redis background job queue for scraping tasks
 
 ### 🕷️ Scraping & Data Extraction Engines
+- **[Naukri Scraper (`naukri-scraper`)](https://www.naukri.com/)** — Specialized Indian tech job market extractor with INR currency and recruiter metadata
 - **[Apify SDK Client](https://docs.apify.com/sdk/js/)** — Integration with Apify platform & cloud actors
 - **[Cheerio 1.2](https://cheerio.js.org/)** — Fast, flexible HTML parsing & DOM data extraction
 - **[Axios 1.19](https://axios-http.com/)** — HTTP client with interceptors for raw page fetching
 
 ### 🎨 Frontend UI, Styling & Visualization
-- **[Tailwind CSS v4](https://tailwindcss.com/)** — Modern utility-first CSS framework with dark mode theme
-- **[Recharts 3.10](https://recharts.org/)** — Interactive analytics charts (Area, Bar, and Donut charts)
-- **[Lucide React](https://lucide.dev/)** — Modern icon set
-- **[Framer Motion 12.43](https://www.framer.com/motion/)** — Micro-animations and page transitions
-- **[Radix UI](https://www.radix-ui.com/)** — Accessible unstyled UI primitives (Dialog, Tabs, Tooltip, Progress, Dropdown Menu)
+- **[Angular 19 Material / Standalone Components](https://angular.dev/)** — Responsive glassmorphic layout and reactive components
+- **[Tailwind CSS v4](https://tailwindcss.com/)** — Modern utility-first CSS design tokens with dark glassmorphism
 - **[date-fns](https://date-fns.org/)** — Date formatting and relative time helpers
 
 ### 🛡️ Security, Authentication & Utilities
@@ -53,31 +50,33 @@ That's it. The script auto-starts MongoDB + Redis via Docker, generates secrets,
 - **[Winston 3.19](https://github.com/winstonjs/winston)** — Structured JSON logging with daily log rotation
 
 ### 🐳 DevOps, Containerization & Infrastructure
+- **[esbuild](https://esbuild.github.io/)** — High-speed bundler compiling Angular 19 TypeScript into `dist/public`
 - **[Docker & Docker Compose](https://www.docker.com/)** — Multi-stage production container setup & service orchestration
 - **[Nginx](https://www.nginx.com/)** — Reverse proxy, load balancing, rate limiting, HSTS, and SSL/TLS termination
-
-### 🌐 Third-Party External Service Integrations
-- **[BrightData](https://brightdata.com/) / [Oxylabs](https://oxylabs.io/)** — Residential proxy network & IP rotation integration
-- **[Amazon Web Services (AWS S3)](https://aws.amazon.com/s3/)** — Automated MongoDB backups & raw scraped payload storage
-- **[SendGrid / SMTP](https://sendgrid.com/)** — Automated email alerting for scraper job failures
-- **[Sentry DSN](https://sentry.io/)** — Real-time application error tracking & exception monitoring
 
 ---
 
 ## ✨ Key Features
 
-- **8+ Job Scrapers** — LinkedIn, Indeed, Glassdoor, Remote OK, Upwork, Google Jobs, Dice, Company Careers
-- **Live Analytics Dashboard** — Real-time charts (area, bar, donut) with 30s auto-refresh
-- **Scraper Run Manager** — Trigger, monitor live duration, abort, or delete runs with 5s polling
+- **8+ Job Scrapers** — LinkedIn, Indeed, **Naukri**, Glassdoor, Remote OK, Upwork, Google Jobs, Dice, Company Careers
+- **Default Scraper Filters**:
+  - **Location**: `Chennai, Madurai`
+  - **Experience**: `2 years`
+  - **Tech Stack**: `MEAN stack, Angular, Node.js, Java`
+- **Live Analytics Dashboard** — Real-time execution stats, scraped job counts, active runners, and cost metrics
+- **Scraper Run Manager** — Trigger, monitor live duration, inspect input/output JSON, or delete runs
 - **Advanced Job Search & Filters**:
   - Filter by Company & Location search
   - Filter by Experience Level (Entry, Mid, Senior, Lead, Executive)
   - Filter by Salary Threshold ($60k+, $80k+, $100k+, $120k+, $150k+)
   - Filter by Posted Date (Last 24h, Last 3 days, Past 7 days, Past 15 days, Past 1 month)
   - Remote Job Toggle & Clear Filters
-- **One-Click CSV Export** — Download filtered job results as formatted `.csv` files
-- **Graceful Fallback Mode** — Works out-of-the-box in demo mode without MongoDB/Redis dependencies
-- **Production Monitoring** — Health checks, Prometheus alert rules, endpoint ping tester
+- **Combined & Platform-Specific CSV Export**:
+  - 📦 **Combined List (All Platforms)** — Single aggregated CSV export
+  - 💼 **Platform-Specific CSV** — Dedicated exports for LinkedIn, Naukri, Indeed, Glassdoor, etc.
+- **Direct Job Portal URLs** — Scraped job links point directly to real listing & application pages (Naukri, LinkedIn, Indeed, etc.)
+- **Graceful Fallback Mode** — Operates seamlessly in demo mode without MongoDB/Redis dependencies
+- **Production Monitoring** — Health checks, Prometheus metrics endpoint (`/api/metrics`)
 
 ---
 
@@ -85,16 +84,18 @@ That's it. The script auto-starts MongoDB + Redis via Docker, generates secrets,
 
 ```
 src/
-├── app/
-│   ├── api/          # REST endpoints (actors, runs, jobs, jobs/export, stats, health, metrics)
-│   ├── dashboard/    # Analytics dashboard page
-│   ├── jobs/         # Job results browser with search & CSV export
-│   ├── monitoring/   # Health & Prometheus monitoring page
-│   └── runs/         # Scraper run manager page
-├── components/       # ActorCard, RunCard, Navbar
+├── app-angular/      # Angular 19 Standalone SPA Frontend
+│   ├── components/   # Store, Jobs, Runs, Dashboard, Monitoring components
+│   ├── app.component.ts
+│   ├── app.config.ts
+│   └── main.ts
 ├── lib/              # db.ts, redis.ts, logger.ts, metrics.ts
-└── models/           # User, Actor, Run, Job (Mongoose schemas)
+├── models/           # User, Actor, Run, Job (Mongoose schemas)
+server.ts             # Standalone Node.js Express API Server
+build.js              # esbuild compiler script for Angular 19
+dist/public/          # Compiled static assets & index.html
 ```
+
 
 ---
 

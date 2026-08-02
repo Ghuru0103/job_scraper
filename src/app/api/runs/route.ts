@@ -102,21 +102,54 @@ async function simulateScrape(run: InstanceType<typeof Run>, actor: { avgResultC
   const jobTitles = ['Senior Software Engineer', 'Full Stack Developer', 'Data Scientist', 'DevOps Engineer', 'ML Engineer', 'Backend Engineer', 'Cloud Architect', 'SRE'];
   const skillSets = [['Python', 'TensorFlow', 'AWS'], ['React', 'Node.js', 'TypeScript'], ['Go', 'Kubernetes', 'Docker'], ['Java', 'Spring Boot', 'Kafka']];
 
+function generateRealPlatformUrl(source: string, title: string, company: string): string {
+  const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const cleanComp = company.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+  switch (source) {
+    case 'naukri-scraper':
+      return `https://www.naukri.com/${cleanTitle}-jobs-${cleanComp}`;
+    case 'linkedin-jobs':
+      return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(title + ' ' + company)}`;
+    case 'indeed-scraper':
+      return `https://www.indeed.com/jobs?q=${encodeURIComponent(title + ' ' + company)}`;
+    case 'glassdoor-scraper':
+      return `https://www.glassdoor.com/Job/jobs.htm?sc.keyword=${encodeURIComponent(title + ' ' + company)}`;
+    case 'remote-ok-scraper':
+      return `https://remoteok.com/remote-${cleanTitle}-jobs`;
+    case 'upwork-scraper':
+      return `https://www.upwork.com/nx/jobs/search/?q=${encodeURIComponent(title)}`;
+    case 'google-jobs-scraper':
+      return `https://www.google.com/search?q=${encodeURIComponent(title + ' ' + company + ' jobs')}`;
+    case 'dice-tech-scraper':
+      return `https://www.dice.com/jobs?q=${encodeURIComponent(title)}`;
+    default:
+      return `https://www.google.com/search?q=${encodeURIComponent(title + ' ' + company + ' careers')}`;
+  }
+}
+
   const count = Math.min(actor.avgResultCount, 50);
-  const jobs = Array.from({ length: count }, (_, i) => ({
-    runId: run._id, userId: run.userId, source: actor.name,
-    title: jobTitles[i % jobTitles.length],
-    company: src.companies[i % src.companies.length],
-    location: src.locations[i % src.locations.length],
-    remote: src.locations[i % src.locations.length] === 'Remote',
-    salary: { min: 80000 + Math.floor(Math.random() * 80000), max: 120000 + Math.floor(Math.random() * 100000), currency: 'USD', period: 'yearly' as const },
-    experienceLevel: (['entry', 'mid', 'senior', 'lead'] as const)[i % 4],
-    jobType: 'full-time' as const,
-    skills: skillSets[i % skillSets.length],
-    url: `https://example.com/jobs/${uuidv4()}`,
-    scrapedAt: new Date(),
-    postedAt: new Date(Date.now() - Math.random() * 7 * 86400000),
-  }));
+  const jobs = Array.from({ length: count }, (_, i) => {
+    const title = jobTitles[i % jobTitles.length];
+    const company = src.companies[i % src.companies.length];
+    return {
+      runId: run._id,
+      userId: run.userId,
+      source: actor.name,
+      title,
+      company,
+      location: src.locations[i % src.locations.length],
+      remote: src.locations[i % src.locations.length] === 'Remote',
+      salary: { min: 80000 + Math.floor(Math.random() * 80000), max: 120000 + Math.floor(Math.random() * 100000), currency: actor.name === 'naukri-scraper' ? 'INR' : 'USD', period: 'yearly' as const },
+      experienceLevel: (['entry', 'mid', 'senior', 'lead'] as const)[i % 4],
+      jobType: 'full-time' as const,
+      skills: skillSets[i % skillSets.length],
+      url: generateRealPlatformUrl(actor.name, title, company),
+      scrapedAt: new Date(),
+      postedAt: new Date(Date.now() - Math.random() * 7 * 86400000),
+    };
+  });
+
 
   await Job.insertMany(jobs);
   jobsScraped.labels(actor.name).inc(count);
