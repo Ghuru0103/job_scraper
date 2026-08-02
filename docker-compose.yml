@@ -1,0 +1,218 @@
+version: '3.8'
+
+services:
+  # ================================
+  # Main Application (3 replicas)
+  # ================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: antigravity-app:latest
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongo-1:27017,mongo-2:27017,mongo-3:27017/antigravity?replicaSet=rs0&retryWrites=true&w=majority
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-password}@redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - LOG_LEVEL=info
+      - LOG_TO_FILE=true
+      - LOG_FILE_PATH=/var/log/antigravity/app.log
+    volumes:
+      - logs:/var/log/antigravity
+    depends_on:
+      mongo-1:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - antigravity-net
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  # ================================
+  # Nginx Reverse Proxy / Load Balancer
+  # ================================
+  nginx:
+    image: nginx:1.25-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+      - nginx-cache:/var/cache/nginx
+    depends_on:
+      - app
+    networks:
+      - antigravity-net
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+
+  # ================================
+  # MongoDB Replica Set (3 nodes)
+  # ================================
+  mongo-1:
+    image: mongo:6.0
+    restart: unless-stopped
+    command: mongod --replSet rs0 --bind_ip_all --auth --keyFile /etc/mongo/keyfile
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password}
+      MONGO_INITDB_DATABASE: antigravity
+    volumes:
+      - mongo-1-data:/data/db
+      - ./mongo/keyfile:/etc/mongo/keyfile:ro
+      - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    networks:
+      - antigravity-net
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mongo-2:
+    image: mongo:6.0
+    restart: unless-stopped
+    command: mongod --replSet rs0 --bind_ip_all --auth --keyFile /etc/mongo/keyfile
+    volumes:
+      - mongo-2-data:/data/db
+      - ./mongo/keyfile:/etc/mongo/keyfile:ro
+    networks:
+      - antigravity-net
+
+  mongo-3:
+    image: mongo:6.0
+    restart: unless-stopped
+    command: mongod --replSet rs0 --bind_ip_all --auth --keyFile /etc/mongo/keyfile
+    volumes:
+      - mongo-3-data:/data/db
+      - ./mongo/keyfile:/etc/mongo/keyfile:ro
+    networks:
+      - antigravity-net
+
+  # MongoDB replica set initializer
+  mongo-init:
+    image: mongo:6.0
+    restart: on-failure
+    command: >
+      mongosh --host mongo-1:27017 -u admin -p ${MONGO_PASSWORD:-password} --authenticationDatabase admin --eval "
+        rs.initiate({
+          _id: 'rs0',
+          members: [
+            { _id: 0, host: 'mongo-1:27017', priority: 2 },
+            { _id: 1, host: 'mongo-2:27017', priority: 1 },
+            { _id: 2, host: 'mongo-3:27017', priority: 1 }
+          ]
+        })
+      "
+    depends_on:
+      - mongo-1
+      - mongo-2
+      - mongo-3
+    networks:
+      - antigravity-net
+
+  # ================================
+  # Redis (primary + sentinel)
+  # ================================
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-password} --maxmemory 512mb --maxmemory-policy allkeys-lru --save 60 1
+    volumes:
+      - redis-data:/data
+    networks:
+      - antigravity-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-password}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ================================
+  # Prometheus Monitoring
+  # ================================
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - antigravity-net
+
+  # ================================
+  # Grafana Dashboards
+  # ================================
+  grafana:
+    image: grafana/grafana:10.2.0
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin123}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: http://localhost:3001
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml:ro
+      - ./monitoring/grafana-dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json:ro
+    depends_on:
+      - prometheus
+    networks:
+      - antigravity-net
+
+# ================================
+# Volumes
+# ================================
+volumes:
+  mongo-1-data:
+  mongo-2-data:
+  mongo-3-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+  nginx-cache:
+  logs:
+
+# ================================
+# Networks
+# ================================
+networks:
+  antigravity-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

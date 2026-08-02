@@ -1,0 +1,50 @@
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/db';
+import { Job } from '@/models/Job';
+import { cacheGet, cacheSet } from '@/lib/redis';
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
+  const source = searchParams.get('source');
+  const company = searchParams.get('company');
+  const remote = searchParams.get('remote');
+  const runId = searchParams.get('runId');
+  const skip = (page - 1) * limit;
+
+  const cacheKey = `jobs:${source}:${company}:${remote}:${runId}:${page}:${limit}`;
+  const cached = await cacheGet(cacheKey);
+  if (cached) return NextResponse.json(cached);
+
+  try {
+    await connectDB();
+
+    // Lean queries with projection for performance
+    const filter: Record<string, unknown> = { userId: '000000000000000000000001' };
+    if (source) filter.source = source;
+    if (company) filter.company = new RegExp(company, 'i');
+    if (remote === 'true') filter.remote = true;
+    if (runId) filter.runId = runId;
+
+    const [jobs, total] = await Promise.all([
+      Job.find(filter, 'title company location remote salary source url skills experienceLevel jobType postedAt scrapedAt')
+        .sort({ scrapedAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Job.countDocuments(filter),
+    ]);
+
+    const response = {
+      jobs,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
+
+    await cacheSet(cacheKey, response, 60); // 1 min cache
+    return NextResponse.json(response);
+  } catch (error) {
+    console.error('GET /api/jobs error:', error);
+    return NextResponse.json({ error: 'Failed to fetch jobs' }, { status: 500 });
+  }
+}
