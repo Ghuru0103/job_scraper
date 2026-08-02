@@ -68,6 +68,7 @@ function JobsContent() {
   const [locationSearch, setLocationSearch] = useState('');
   const [experienceFilter, setExperienceFilter] = useState('');
   const [minSalaryFilter, setMinSalaryFilter] = useState('');
+  const [postedFilter, setPostedFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState(initialSource);
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
@@ -84,6 +85,7 @@ function JobsContent() {
       if (locationSearch) params.set('location', locationSearch);
       if (experienceFilter) params.set('experienceLevel', experienceFilter);
       if (minSalaryFilter) params.set('minSalary', minSalaryFilter);
+      if (postedFilter) params.set('postedWithinDays', postedFilter);
       const res = await fetch(`/api/jobs?${params}`);
       const data = await res.json();
       setJobs(data.jobs || []);
@@ -93,7 +95,7 @@ function JobsContent() {
     } finally {
       setLoading(false);
     }
-  }, [sourceFilter, remoteOnly, search, locationSearch, experienceFilter, minSalaryFilter]);
+  }, [sourceFilter, remoteOnly, search, locationSearch, experienceFilter, minSalaryFilter, postedFilter]);
 
   useEffect(() => { fetchJobs(1); }, [fetchJobs]);
 
@@ -107,6 +109,7 @@ function JobsContent() {
     if (locationSearch) params.set('location', locationSearch);
     if (experienceFilter) params.set('experienceLevel', experienceFilter);
     if (minSalaryFilter) params.set('minSalary', minSalaryFilter);
+    if (postedFilter) params.set('postedWithinDays', postedFilter);
     window.open(`/api/jobs/export?${params.toString()}`, '_blank');
   };
 
@@ -116,10 +119,11 @@ function JobsContent() {
     setSourceFilter('');
     setExperienceFilter('');
     setMinSalaryFilter('');
+    setPostedFilter('');
     setRemoteOnly(false);
   };
 
-  const hasActiveFilters = search || locationSearch || sourceFilter || experienceFilter || minSalaryFilter || remoteOnly;
+  const hasActiveFilters = search || locationSearch || sourceFilter || experienceFilter || minSalaryFilter || postedFilter || remoteOnly;
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -234,6 +238,16 @@ function JobsContent() {
             <option value="100000">💰 $100k+ / yr</option>
             <option value="120000">💰 $120k+ / yr</option>
             <option value="150000">💰 $150k+ / yr</option>
+          </select>
+
+          {/* Posted Date Select */}
+          <select className="input" style={{ minWidth: '140px', flex: '0 0 auto' }} value={postedFilter} onChange={(e) => setPostedFilter(e.target.value)}>
+            <option value="">Any Time</option>
+            <option value="1">⏱ Last 1 day</option>
+            <option value="3">⏱ Last 3 days</option>
+            <option value="7">📅 Past 7 days</option>
+            <option value="15">📅 Past 15 days</option>
+            <option value="30">📅 Past 1 month</option>
           </select>
 
           {/* Remote Toggle */}

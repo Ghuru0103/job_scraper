@@ -34,9 +34,12 @@ export async function GET(request: NextRequest) {
   const experienceLevel = searchParams.get('experienceLevel');
   const minSalaryStr = searchParams.get('minSalary');
   const minSalary = minSalaryStr ? parseInt(minSalaryStr) : 0;
+  const postedWithinDaysStr = searchParams.get('postedWithinDays');
+  const postedWithinDays = postedWithinDaysStr ? parseInt(postedWithinDaysStr) : 0;
   const remote = searchParams.get('remote');
   const runId = searchParams.get('runId');
 
+  const cutoffDate = postedWithinDays > 0 ? new Date(Date.now() - postedWithinDays * 86400000) : null;
   let jobsList: JobRecord[] = [];
 
   try {
@@ -47,6 +50,7 @@ export async function GET(request: NextRequest) {
     if (location) filter.location = new RegExp(location, 'i');
     if (experienceLevel) filter.experienceLevel = experienceLevel;
     if (minSalary > 0) filter['salary.max'] = { $gte: minSalary };
+    if (cutoffDate) filter.postedAt = { $gte: cutoffDate };
     if (remote === 'true') filter.remote = true;
     if (runId) filter.runId = runId;
 
@@ -63,6 +67,12 @@ export async function GET(request: NextRequest) {
       filtered = filtered.filter((j) => {
         const sal = j.salary;
         return ((sal?.max ?? sal?.min) ?? 0) >= minSalary;
+      });
+    }
+    if (cutoffDate) {
+      filtered = filtered.filter((j) => {
+        if (!j.postedAt) return false;
+        return new Date(j.postedAt as string).getTime() >= cutoffDate.getTime();
       });
     }
     if (remote === 'true') filtered = filtered.filter((j) => j.remote === true);
