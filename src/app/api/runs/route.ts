@@ -16,8 +16,9 @@ type MockRun = {
   createdAt: string;
 };
 
-const memoryRuns: MockRun[] = [];
+export const memoryRuns: MockRun[] = [];
 export const memoryJobStore: Array<Record<string, unknown>> = [];
+
 
 const SEED_ACTORS_MAP: Record<string, { name: string; avgResultCount: number }> = {
   'linkedin-jobs':           { name: 'linkedin-jobs',           avgResultCount: 50 },
