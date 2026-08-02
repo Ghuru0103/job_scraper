@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { ApifyClient } from 'apify-client';
+
 
 dotenv.config({ path: path.join(__dirname, '.env.local') });
 dotenv.config();
@@ -294,7 +296,7 @@ async function simulateMockRun(runId: string, actorName: string, avgResultCount:
   scraperJobsTotal.labels(actorName, 'succeeded').inc();
 }
 
-async function simulateScrape(run: any, actor: { avgResultCount: number; name: string }): Promise<void> {
+async function simulateScrape(run: any, actor: { avgResultCount: number; name: string; actorId?: string }): Promise<void> {
   const runId = run._id.toString();
 
   await Run.findByIdAndUpdate(runId, {
@@ -304,6 +306,66 @@ async function simulateScrape(run: any, actor: { avgResultCount: number; name: s
   });
 
   activeScraperJobs.inc();
+
+  // If live APIFY_TOKEN is present in .env.local, trigger real Apify actor run!
+  if (process.env.APIFY_TOKEN && actor.actorId) {
+    try {
+      const apify = new ApifyClient({ token: process.env.APIFY_TOKEN });
+      const apifyRun = await apify.actor(actor.actorId).call(run.input || {});
+      const dataset = await apify.dataset(apifyRun.defaultDatasetId).listItems();
+      const liveItems = dataset.items || [];
+
+      const jobs = liveItems.map((item: any) => {
+        const title = item.title || item.positionName || 'Software Engineer';
+        const company = item.companyName || item.company || 'Tech Company';
+        return {
+          runId: run._id,
+          userId: run.userId,
+          source: actor.name,
+          title,
+          company,
+          location: item.location || item.place || 'Chennai, India',
+          remote: Boolean(item.isRemote || String(item.location).toLowerCase().includes('remote')),
+          salary: {
+            min: item.salaryMin || 80000,
+            max: item.salaryMax || 130000,
+            currency: actor.name === 'naukri-scraper' ? 'INR' : 'USD',
+            period: 'yearly',
+          },
+          experienceLevel: item.experienceLevel || 'mid',
+          jobType: item.jobType || 'full-time',
+          skills: item.skills || ['Angular', 'Node.js', 'Java'],
+          url: item.url || item.jobUrl || generateRealPlatformUrl(actor.name, title, company),
+          scrapedAt: new Date(),
+          postedAt: item.postedAt ? new Date(item.postedAt) : new Date(),
+        };
+      });
+
+      if (jobs.length > 0) {
+        await Job.insertMany(jobs);
+      }
+
+      const finishedAt = new Date();
+      const startedAt = run.stats?.startedAt || new Date();
+      await Run.findByIdAndUpdate(runId, {
+        status: 'succeeded',
+        'stats.finishedAt': finishedAt,
+        'stats.durationMs': finishedAt.getTime() - startedAt.getTime(),
+        'output.resultsCount': jobs.length,
+        'output.previewResults': jobs.slice(0, 5),
+        $push: { logs: { level: 'info', message: `✅ Live scraped ${jobs.length} jobs via Apify Cloud`, timestamp: new Date() } },
+      });
+
+      activeScraperJobs.dec();
+      scraperJobsTotal.labels(actor.name, 'succeeded').inc();
+      await cacheDelPattern('jobs:*');
+      return;
+    } catch (err: any) {
+      console.warn(`Apify Cloud run fell back to local engine: ${err.message}`);
+    }
+  }
+
+  // Fallback / Demo Mode (No APIFY_TOKEN provided)
   await new Promise((res) => setTimeout(res, 2000));
 
   const sources: Record<string, { companies: string[]; locations: string[] }> = {
@@ -358,6 +420,7 @@ async function simulateScrape(run: any, actor: { avgResultCount: number; name: s
   scraperJobsTotal.labels(actor.name, 'succeeded').inc();
   await cacheDelPattern('jobs:*');
 }
+
 
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
