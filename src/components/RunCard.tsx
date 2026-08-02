@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { RunStatus } from '@/models/Run';
 
 interface RunCardProps {
@@ -9,7 +10,7 @@ interface RunCardProps {
     actorName: string;
     status: RunStatus;
     input: Record<string, unknown>;
-    output?: { resultsCount: number };
+    output?: { resultsCount: number; previewResults?: unknown[] };
     stats: {
       startedAt?: string;
       finishedAt?: string;
@@ -53,7 +54,9 @@ function timeAgo(iso: string): string {
 }
 
 export default function RunCard({ run, onAbort, onDelete }: RunCardProps) {
+  const [expanded, setExpanded] = useState(false);
   const cfg = statusConfig[run.status] || statusConfig.pending;
+  const hasResults = (run.output?.resultsCount ?? 0) > 0 || run.status === 'succeeded';
 
   return (
     <div
@@ -105,7 +108,7 @@ export default function RunCard({ run, onAbort, onDelete }: RunCardProps) {
             <div>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.125rem' }}>Results</div>
               <div style={{ fontSize: '0.875rem', fontWeight: 600, color: run.output?.resultsCount ? 'var(--accent-green)' : 'var(--text-muted)' }}>
-                {run.output?.resultsCount ?? '—'}
+                {run.output?.resultsCount ?? (run.status === 'running' ? 'Scraping...' : '—')}
               </div>
             </div>
             <div>
@@ -135,7 +138,25 @@ export default function RunCard({ run, onAbort, onDelete }: RunCardProps) {
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: '0.375rem', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, alignItems: 'center' }}>
+          {hasResults && (
+            <a
+              href={`/jobs?source=${encodeURIComponent(run.actorName || run.actorId)}`}
+              className="btn btn-primary btn-sm"
+              style={{ textDecoration: 'none', background: 'var(--gradient-primary)' }}
+            >
+              💼 View Results ({run.output?.resultsCount || 'Jobs'})
+            </a>
+          )}
+
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => setExpanded(!expanded)}
+            title="Toggle Details"
+          >
+            {expanded ? '🔼 Hide' : '👁 Details'}
+          </button>
+
           {run.status === 'running' && onAbort && (
             <button
               className="btn btn-danger btn-sm"
@@ -144,17 +165,79 @@ export default function RunCard({ run, onAbort, onDelete }: RunCardProps) {
               ⏹ Abort
             </button>
           )}
+
           {['succeeded', 'failed', 'aborted', 'timed-out'].includes(run.status) && onDelete && (
             <button
               className="btn btn-ghost btn-sm"
               onClick={() => onDelete(run._id)}
               style={{ color: 'var(--text-muted)' }}
+              title="Delete Run"
             >
               🗑
             </button>
           )}
         </div>
       </div>
+
+      {/* Expanded details section */}
+      {expanded && (
+        <div
+          style={{
+            marginTop: '1rem',
+            paddingTop: '1rem',
+            borderTop: '1px solid var(--border-subtle)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem',
+            fontSize: '0.8rem',
+          }}
+        >
+          {/* Input config */}
+          <div>
+            <div style={{ fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+              ⚙️ Input Config:
+            </div>
+            <pre
+              style={{
+                background: 'var(--bg-secondary)',
+                padding: '0.5rem 0.75rem',
+                borderRadius: 'var(--radius-sm)',
+                overflowX: 'auto',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '0.75rem',
+                margin: 0,
+              }}
+            >
+              {JSON.stringify(run.input || {}, null, 2)}
+            </pre>
+          </div>
+
+          {/* Results Preview */}
+          {run.output?.previewResults && run.output.previewResults.length > 0 && (
+            <div>
+              <div style={{ fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+                📋 Scraped Results Preview ({run.output.previewResults.length} sample records):
+              </div>
+              <pre
+                style={{
+                  background: 'var(--bg-secondary)',
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: 'var(--radius-sm)',
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  color: 'var(--accent-green)',
+                  fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: '0.75rem',
+                  margin: 0,
+                }}
+              >
+                {JSON.stringify(run.output.previewResults, null, 2)}
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

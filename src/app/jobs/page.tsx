@@ -44,11 +44,28 @@ function timeAgo(iso?: string): string {
   return `${Math.floor(diff / 86400000)}d ago`;
 }
 
-export default function JobsPage() {
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+
+const ALL_SOURCES = [
+  'linkedin-jobs',
+  'indeed-scraper',
+  'glassdoor-scraper',
+  'remote-ok-scraper',
+  'upwork-scraper',
+  'google-jobs-scraper',
+  'dice-tech-scraper',
+  'company-careers-scraper',
+];
+
+function JobsContent() {
+  const searchParams = useSearchParams();
+  const initialSource = searchParams?.get('source') || '';
+
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState('');
+  const [sourceFilter, setSourceFilter] = useState(initialSource);
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [pagination, setPagination] = useState({ page: 1, total: 0, totalPages: 1 });
@@ -74,7 +91,7 @@ export default function JobsPage() {
 
   useEffect(() => { fetchJobs(1); }, [fetchJobs]);
 
-  const sources = [...new Set(jobs.map((j) => j.source))];
+  const sources = Array.from(new Set([...ALL_SOURCES, ...jobs.map((j) => j.source)]));
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -376,5 +393,13 @@ export default function JobsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function JobsPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading jobs...</div>}>
+      <JobsContent />
+    </Suspense>
   );
 }

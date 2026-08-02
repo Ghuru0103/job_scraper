@@ -1,44 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import { Run } from '@/models/Run';
+import { memoryRuns } from '../route';
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await connectDB();
-    const { id } = await params;
     const run = await Run.findById(id).lean();
-    if (!run) {
-      return NextResponse.json({ error: 'Run not found' }, { status: 404 });
-    }
-    return NextResponse.json({ run });
-  } catch (error) {
-    console.error('GET /api/runs/[id] error:', error);
-    return NextResponse.json({ error: 'Failed to fetch run' }, { status: 500 });
+    if (run) return NextResponse.json({ run });
+  } catch {
+    // Fallback to memory runs
   }
+
+  const memRun = memoryRuns.find((r) => r._id === id);
+  if (memRun) {
+    return NextResponse.json({ run: memRun });
+  }
+  return NextResponse.json({ error: 'Run not found' }, { status: 404 });
 }
 
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await connectDB();
-    const { id } = await params;
     const run = await Run.findById(id);
-    if (!run) {
-      return NextResponse.json({ error: 'Run not found' }, { status: 404 });
+    if (run) {
+      if (run.status === 'running') {
+        await Run.findByIdAndUpdate(id, { status: 'aborted' });
+        return NextResponse.json({ message: 'Run aborted' });
+      }
+      await Run.findByIdAndDelete(id);
+      return NextResponse.json({ message: 'Run deleted' });
     }
-    if (run.status === 'running') {
-      await Run.findByIdAndUpdate(id, { status: 'aborted' });
+  } catch {
+    // Fallback to memory runs
+  }
+
+  const index = memoryRuns.findIndex((r) => r._id === id);
+  if (index !== -1) {
+    if (memoryRuns[index].status === 'running') {
+      memoryRuns[index].status = 'aborted';
       return NextResponse.json({ message: 'Run aborted' });
     }
-    await Run.findByIdAndDelete(id);
+    memoryRuns.splice(index, 1);
     return NextResponse.json({ message: 'Run deleted' });
-  } catch (error) {
-    console.error('DELETE /api/runs/[id] error:', error);
-    return NextResponse.json({ error: 'Failed to delete run' }, { status: 500 });
   }
+
+  return NextResponse.json({ error: 'Run not found' }, { status: 404 });
 }

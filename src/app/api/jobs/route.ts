@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import { Job } from '@/models/Job';
 import { cacheGet, cacheSet } from '@/lib/redis';
+import { memoryJobStore } from '@/app/api/runs/route';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -43,8 +44,19 @@ export async function GET(request: NextRequest) {
 
     await cacheSet(cacheKey, response, 60); // 1 min cache
     return NextResponse.json(response);
-  } catch (error) {
-    console.error('GET /api/jobs error:', error);
-    return NextResponse.json({ error: 'Failed to fetch jobs' }, { status: 500 });
+  } catch {
+    // Fallback: serve from in-memory job store
+    let filtered = [...memoryJobStore] as Array<Record<string, unknown>>;
+    if (source) filtered = filtered.filter((j) => j.source === source);
+    if (company) filtered = filtered.filter((j) => String(j.company).toLowerCase().includes(company.toLowerCase()));
+    if (remote === 'true') filtered = filtered.filter((j) => j.remote === true);
+    if (runId) filtered = filtered.filter((j) => j.runId === runId);
+
+    const total = filtered.length;
+    const paginated = filtered.slice(skip, skip + limit);
+    return NextResponse.json({
+      jobs: paginated,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
   }
 }
