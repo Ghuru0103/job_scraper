@@ -65,6 +65,9 @@ function JobsContent() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [locationSearch, setLocationSearch] = useState('');
+  const [experienceFilter, setExperienceFilter] = useState('');
+  const [minSalaryFilter, setMinSalaryFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState(initialSource);
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
@@ -78,6 +81,9 @@ function JobsContent() {
       if (sourceFilter) params.set('source', sourceFilter);
       if (remoteOnly) params.set('remote', 'true');
       if (search) params.set('company', search);
+      if (locationSearch) params.set('location', locationSearch);
+      if (experienceFilter) params.set('experienceLevel', experienceFilter);
+      if (minSalaryFilter) params.set('minSalary', minSalaryFilter);
       const res = await fetch(`/api/jobs?${params}`);
       const data = await res.json();
       setJobs(data.jobs || []);
@@ -87,7 +93,7 @@ function JobsContent() {
     } finally {
       setLoading(false);
     }
-  }, [sourceFilter, remoteOnly, search]);
+  }, [sourceFilter, remoteOnly, search, locationSearch, experienceFilter, minSalaryFilter]);
 
   useEffect(() => { fetchJobs(1); }, [fetchJobs]);
 
@@ -98,8 +104,22 @@ function JobsContent() {
     if (sourceFilter) params.set('source', sourceFilter);
     if (remoteOnly) params.set('remote', 'true');
     if (search) params.set('company', search);
+    if (locationSearch) params.set('location', locationSearch);
+    if (experienceFilter) params.set('experienceLevel', experienceFilter);
+    if (minSalaryFilter) params.set('minSalary', minSalaryFilter);
     window.open(`/api/jobs/export?${params.toString()}`, '_blank');
   };
+
+  const clearAllFilters = () => {
+    setSearch('');
+    setLocationSearch('');
+    setSourceFilter('');
+    setExperienceFilter('');
+    setMinSalaryFilter('');
+    setRemoteOnly(false);
+  };
+
+  const hasActiveFilters = search || locationSearch || sourceFilter || experienceFilter || minSalaryFilter || remoteOnly;
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -154,7 +174,7 @@ function JobsContent() {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Filters bar */}
         <div
           style={{
             display: 'flex',
@@ -165,23 +185,58 @@ function JobsContent() {
             background: 'var(--bg-card)',
             borderRadius: 'var(--radius-lg)',
             border: '1px solid var(--border-subtle)',
+            alignItems: 'center',
           }}
         >
-          <div className="input-group" style={{ flex: 1, minWidth: '180px' }}>
-            <span className="input-icon">🔍</span>
+          {/* Company Search */}
+          <div className="input-group" style={{ flex: '1 1 180px', minWidth: '150px' }}>
+            <span className="input-icon">🏢</span>
             <input
               className="input"
-              placeholder="Search company..."
+              placeholder="Filter company..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          {sources.length > 0 && (
-            <select className="input" style={{ minWidth: '160px', flex: '0 0 auto' }} value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}>
-              <option value="">All Sources</option>
-              {sources.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-          )}
+
+          {/* Location Search */}
+          <div className="input-group" style={{ flex: '1 1 180px', minWidth: '150px' }}>
+            <span className="input-icon">📍</span>
+            <input
+              className="input"
+              placeholder="Filter location..."
+              value={locationSearch}
+              onChange={(e) => setLocationSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Source Select */}
+          <select className="input" style={{ minWidth: '140px', flex: '0 0 auto' }} value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}>
+            <option value="">All Sources</option>
+            {sources.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+
+          {/* Experience Level Select */}
+          <select className="input" style={{ minWidth: '140px', flex: '0 0 auto' }} value={experienceFilter} onChange={(e) => setExperienceFilter(e.target.value)}>
+            <option value="">All Levels</option>
+            <option value="entry">🌱 Entry Level</option>
+            <option value="mid">⚡ Mid Level</option>
+            <option value="senior">🔥 Senior Level</option>
+            <option value="lead">👑 Lead Level</option>
+            <option value="executive">🚀 Executive</option>
+          </select>
+
+          {/* Salary Threshold Select */}
+          <select className="input" style={{ minWidth: '140px', flex: '0 0 auto' }} value={minSalaryFilter} onChange={(e) => setMinSalaryFilter(e.target.value)}>
+            <option value="">Any Salary</option>
+            <option value="60000">💰 $60k+ / yr</option>
+            <option value="80000">💰 $80k+ / yr</option>
+            <option value="100000">💰 $100k+ / yr</option>
+            <option value="120000">💰 $120k+ / yr</option>
+            <option value="150000">💰 $150k+ / yr</option>
+          </select>
+
+          {/* Remote Toggle */}
           <button
             className="btn btn-sm"
             style={{
@@ -193,6 +248,17 @@ function JobsContent() {
           >
             🌍 Remote Only
           </button>
+
+          {/* Clear Filters Button */}
+          {hasActiveFilters && (
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={clearAllFilters}
+              style={{ color: 'var(--accent-red)', fontWeight: 600 }}
+            >
+              ✕ Clear Filters
+            </button>
+          )}
         </div>
 
         {loading ? (

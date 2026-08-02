@@ -30,6 +30,10 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const source = searchParams.get('source');
   const company = searchParams.get('company');
+  const location = searchParams.get('location');
+  const experienceLevel = searchParams.get('experienceLevel');
+  const minSalaryStr = searchParams.get('minSalary');
+  const minSalary = minSalaryStr ? parseInt(minSalaryStr) : 0;
   const remote = searchParams.get('remote');
   const runId = searchParams.get('runId');
 
@@ -40,6 +44,9 @@ export async function GET(request: NextRequest) {
     const filter: Record<string, unknown> = { userId: '000000000000000000000001' };
     if (source) filter.source = source;
     if (company) filter.company = new RegExp(company, 'i');
+    if (location) filter.location = new RegExp(location, 'i');
+    if (experienceLevel) filter.experienceLevel = experienceLevel;
+    if (minSalary > 0) filter['salary.max'] = { $gte: minSalary };
     if (remote === 'true') filter.remote = true;
     if (runId) filter.runId = runId;
 
@@ -50,6 +57,14 @@ export async function GET(request: NextRequest) {
     let filtered = [...memoryJobStore] as JobRecord[];
     if (source) filtered = filtered.filter((j) => j.source === source);
     if (company) filtered = filtered.filter((j) => String(j.company).toLowerCase().includes(company.toLowerCase()));
+    if (location) filtered = filtered.filter((j) => String(j.location).toLowerCase().includes(location.toLowerCase()));
+    if (experienceLevel) filtered = filtered.filter((j) => j.experienceLevel === experienceLevel);
+    if (minSalary > 0) {
+      filtered = filtered.filter((j) => {
+        const sal = j.salary;
+        return ((sal?.max ?? sal?.min) ?? 0) >= minSalary;
+      });
+    }
     if (remote === 'true') filtered = filtered.filter((j) => j.remote === true);
     if (runId) filtered = filtered.filter((j) => j.runId === runId);
     jobsList = filtered;
