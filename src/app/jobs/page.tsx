@@ -50,6 +50,7 @@ import { Suspense } from 'react';
 const ALL_SOURCES = [
   'linkedin-jobs',
   'indeed-scraper',
+  'naukri-scraper',
   'glassdoor-scraper',
   'remote-ok-scraper',
   'upwork-scraper',

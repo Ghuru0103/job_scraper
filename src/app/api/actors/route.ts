@@ -23,7 +23,7 @@ const SEED_ACTORS = [
   },
   {
     actorId: 'indeed-scraper',
-    name: 'indeed-jobs-scraper',
+    name: 'indeed-scraper',
     title: 'Indeed Jobs Scraper',
     description:
       'Extract thousands of job postings from Indeed across all industries and locations worldwide.',
@@ -36,6 +36,22 @@ const SEED_ACTORS = [
     isFeatured: true,
     totalRuns: 124870,
     defaultInput: { maxResults: 200, remote: false },
+  },
+  {
+    actorId: 'naukri-scraper',
+    name: 'naukri-scraper',
+    title: 'Naukri Jobs Scraper',
+    description:
+      "Extract thousands of job listings from Naukri.com, India's #1 job portal, with salary, experience, skills, and recruiter details.",
+    category: 'job-boards',
+    icon: '🇮🇳',
+    tags: ['naukri', 'india', 'tech-jobs', 'mass-scraping'],
+    avgRunTime: 45,
+    avgResultCount: 350,
+    successRate: 96,
+    isFeatured: true,
+    totalRuns: 95400,
+    defaultInput: { maxResults: 150, remote: false },
   },
   {
     actorId: 'glassdoor-scraper',

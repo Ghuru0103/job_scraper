@@ -22,6 +22,7 @@ export const memoryJobStore: Array<Record<string, unknown>> = [];
 const SEED_ACTORS_MAP: Record<string, { name: string; avgResultCount: number }> = {
   'linkedin-jobs':           { name: 'linkedin-jobs',           avgResultCount: 50 },
   'indeed-scraper':          { name: 'indeed-scraper',          avgResultCount: 50 },
+  'naukri-scraper':          { name: 'naukri-scraper',          avgResultCount: 50 },
   'glassdoor-scraper':       { name: 'glassdoor-scraper',       avgResultCount: 50 },
   'remote-ok-scraper':       { name: 'remote-ok-scraper',       avgResultCount: 50 },
   'upwork-scraper':          { name: 'upwork-scraper',          avgResultCount: 50 },
@@ -33,6 +34,8 @@ const SEED_ACTORS_MAP: Record<string, { name: string; avgResultCount: number }> 
 function buildMockJobs(actorName: string, count: number, runId: string) {
   const src = actorName === 'linkedin-jobs'
     ? { companies: ['Google', 'Meta', 'Amazon', 'Apple', 'Microsoft'], locations: ['San Francisco, CA', 'New York, NY', 'Remote'] }
+    : actorName === 'naukri-scraper'
+    ? { companies: ['TCS', 'Infosys', 'Wipro', 'Flipkart', 'Swiggy', 'Zomato', 'Reliance Jio'], locations: ['Bengaluru, India', 'Gurgaon, India', 'Mumbai, India', 'Hyderabad, India', 'Remote'] }
     : { companies: ['TechCorp', 'DataSoft', 'CloudBase', 'AILabs', 'StartupXYZ'], locations: ['Austin, TX', 'Boston, MA', 'Remote'] };
 
   const titles = ['Senior Software Engineer', 'Full Stack Developer', 'Data Scientist', 'DevOps Engineer', 'ML Engineer', 'Backend Engineer'];
@@ -44,7 +47,7 @@ function buildMockJobs(actorName: string, count: number, runId: string) {
     company: src.companies[i % src.companies.length],
     location: src.locations[i % src.locations.length],
     remote: src.locations[i % src.locations.length] === 'Remote',
-    salary: { min: 80000 + i * 2000, max: 130000 + i * 2000, currency: 'USD', period: 'yearly' },
+    salary: { min: 80000 + i * 2000, max: 130000 + i * 2000, currency: actorName === 'naukri-scraper' ? 'INR' : 'USD', period: 'yearly' },
     experienceLevel: (['entry', 'mid', 'senior', 'lead'] as const)[i % 4],
     jobType: 'full-time',
     skills: skills[i % skills.length],
@@ -91,6 +94,7 @@ async function simulateScrape(run: InstanceType<typeof Run>, actor: { avgResultC
   const sources: Record<string, { companies: string[]; locations: string[] }> = {
     'linkedin-jobs': { companies: ['Google', 'Meta', 'Amazon', 'Apple', 'Microsoft', 'Netflix'], locations: ['San Francisco, CA', 'New York, NY', 'Remote'] },
     'indeed-scraper': { companies: ['Walmart', 'UnitedHealth', 'CVS Health', 'Apple'], locations: ['Chicago, IL', 'Houston, TX', 'Remote'] },
+    'naukri-scraper': { companies: ['TCS', 'Infosys', 'Wipro', 'Flipkart', 'Swiggy', 'Zomato', 'Reliance Jio'], locations: ['Bengaluru, India', 'Gurgaon, India', 'Mumbai, India', 'Hyderabad, India', 'Remote'] },
     default: { companies: ['TechCorp', 'DataSoft', 'CloudBase', 'AILabs'], locations: ['Boston, MA', 'Denver, CO', 'Remote'] },
   };
 
