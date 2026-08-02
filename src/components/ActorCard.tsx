@@ -41,14 +41,16 @@ const categoryLabels: Record<string, string> = {
 
 export default function ActorCard({ actor, onRun, isRunning }: ActorCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [location, setLocation] = useState('');
+  const [searchQuery, setSearchQuery] = useState('MEAN stack, Angular, Node.js, Java');
+  const [location, setLocation] = useState('Chennai, Madurai');
+  const [experience, setExperience] = useState('2 years');
   const [maxResults, setMaxResults] = useState(100);
 
   const handleRun = () => {
     onRun(actor.actorId, {
       searchQuery: searchQuery || undefined,
       location: location || undefined,
+      experience: experience || undefined,
       maxResults,
     });
   };
@@ -170,24 +172,35 @@ export default function ActorCard({ actor, onRun, isRunning }: ActorCardProps) {
         >
           <div>
             <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Search Query
+              Tech Stack / Search Keywords
             </label>
             <input
               className="input"
-              placeholder="e.g. Senior React Developer"
+              placeholder="e.g. MEAN stack, Angular, Node.js, Java"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <div>
             <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Location
+              Location(s)
             </label>
             <input
               className="input"
-              placeholder="e.g. San Francisco, CA or Remote"
+              placeholder="e.g. Chennai, Madurai"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Required Experience
+            </label>
+            <input
+              className="input"
+              placeholder="e.g. 2 years"
+              value={experience}
+              onChange={(e) => setExperience(e.target.value)}
             />
           </div>
           <div>

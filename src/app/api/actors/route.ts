@@ -19,7 +19,7 @@ const SEED_ACTORS = [
     successRate: 92,
     isFeatured: true,
     totalRuns: 48320,
-    defaultInput: { maxResults: 100, remote: false },
+    defaultInput: { searchQuery: 'MEAN stack, Angular, Node.js, Java', location: 'Chennai, Madurai', experience: '2 years', maxResults: 150 },
   },
   {
     actorId: 'indeed-scraper',
@@ -35,7 +35,7 @@ const SEED_ACTORS = [
     successRate: 97,
     isFeatured: true,
     totalRuns: 124870,
-    defaultInput: { maxResults: 200, remote: false },
+    defaultInput: { searchQuery: 'MEAN stack, Angular, Node.js, Java', location: 'Chennai, Madurai', experience: '2 years', maxResults: 200 },
   },
   {
     actorId: 'naukri-scraper',
@@ -51,7 +51,7 @@ const SEED_ACTORS = [
     successRate: 96,
     isFeatured: true,
     totalRuns: 95400,
-    defaultInput: { maxResults: 150, remote: false },
+    defaultInput: { searchQuery: 'MEAN stack, Angular, Node.js, Java', location: 'Chennai, Madurai', experience: '2 years', maxResults: 150 },
   },
   {
     actorId: 'glassdoor-scraper',
@@ -67,7 +67,7 @@ const SEED_ACTORS = [
     successRate: 89,
     isFeatured: false,
     totalRuns: 32140,
-    defaultInput: { maxResults: 100, includeSalary: true },
+    defaultInput: { searchQuery: 'MEAN stack, Angular, Node.js, Java', location: 'Chennai, Madurai', experience: '2 years', maxResults: 100 },
   },
   {
     actorId: 'remote-ok-scraper',
@@ -82,7 +82,7 @@ const SEED_ACTORS = [
     successRate: 99,
     isFeatured: true,
     totalRuns: 67890,
-    defaultInput: { maxResults: 100 },
+    defaultInput: { searchQuery: 'MEAN stack, Angular, Node.js, Java', location: 'Chennai, Madurai', experience: '2 years', maxResults: 100 },
   },
   {
     actorId: 'upwork-scraper',
@@ -98,7 +98,7 @@ const SEED_ACTORS = [
     successRate: 88,
     isFeatured: false,
     totalRuns: 21560,
-    defaultInput: { maxResults: 50 },
+    defaultInput: { searchQuery: 'MEAN stack, Angular, Node.js, Java', location: 'Chennai, Madurai', experience: '2 years', maxResults: 50 },
   },
   {
     actorId: 'google-jobs-scraper',
@@ -114,7 +114,7 @@ const SEED_ACTORS = [
     successRate: 95,
     isFeatured: true,
     totalRuns: 89230,
-    defaultInput: { maxResults: 150 },
+    defaultInput: { searchQuery: 'MEAN stack, Angular, Node.js, Java', location: 'Chennai, Madurai', experience: '2 years', maxResults: 150 },
   },
   {
     actorId: 'dice-tech-scraper',
@@ -130,7 +130,7 @@ const SEED_ACTORS = [
     successRate: 93,
     isFeatured: false,
     totalRuns: 18920,
-    defaultInput: { maxResults: 100 },
+    defaultInput: { searchQuery: 'MEAN stack, Angular, Node.js, Java', location: 'Chennai, Madurai', experience: '2 years', maxResults: 100 },
   },
   {
     actorId: 'company-careers-scraper',
@@ -146,7 +146,7 @@ const SEED_ACTORS = [
     successRate: 85,
     isFeatured: false,
     totalRuns: 9870,
-    defaultInput: { maxResults: 50, domains: [] },
+    defaultInput: { searchQuery: 'MEAN stack, Angular, Node.js, Java', location: 'Chennai, Madurai', experience: '2 years', maxResults: 50 },
   },
 ];
 

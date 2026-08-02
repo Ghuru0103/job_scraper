@@ -59,6 +59,17 @@ const ALL_SOURCES = [
   'company-careers-scraper',
 ];
 
+const dropdownBtnStyle = {
+  width: '100%',
+  textAlign: 'left' as const,
+  padding: '0.4rem 0.75rem',
+  background: 'none',
+  border: 'none',
+  color: 'var(--text-primary)',
+  cursor: 'pointer',
+  fontSize: '0.8rem',
+};
+
 function JobsContent() {
   const searchParams = useSearchParams();
   const initialSource = searchParams?.get('source') || '';
@@ -102,9 +113,12 @@ function JobsContent() {
 
   const sources = Array.from(new Set([...ALL_SOURCES, ...jobs.map((j) => j.source)]));
 
-  const handleExportCSV = () => {
+  const [showExportMenu, setShowExportMenu] = useState(false);
+
+  const handleExportCSV = (specificSource?: string) => {
     const params = new URLSearchParams();
-    if (sourceFilter) params.set('source', sourceFilter);
+    const targetSource = specificSource !== undefined ? specificSource : sourceFilter;
+    if (targetSource) params.set('source', targetSource);
     if (remoteOnly) params.set('remote', 'true');
     if (search) params.set('company', search);
     if (locationSearch) params.set('location', locationSearch);
@@ -112,6 +126,7 @@ function JobsContent() {
     if (minSalaryFilter) params.set('minSalary', minSalaryFilter);
     if (postedFilter) params.set('postedWithinDays', postedFilter);
     window.open(`/api/jobs/export?${params.toString()}`, '_blank');
+    setShowExportMenu(false);
   };
 
   const clearAllFilters = () => {
@@ -142,21 +157,87 @@ function JobsContent() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            {/* Export CSV button */}
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={handleExportCSV}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.375rem',
-                fontWeight: 600,
-                borderColor: 'var(--border-subtle)',
-              }}
-            >
-              📥 Export CSV
-            </button>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', position: 'relative' }}>
+            {/* Export CSV dropdown menu */}
+            <div style={{ position: 'relative' }}>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  fontWeight: 600,
+                  borderColor: 'var(--border-subtle)',
+                }}
+              >
+                📥 Export CSV ▾
+              </button>
+
+              {showExportMenu && (
+                <div
+                  className="animate-fade-in"
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 0.5rem)',
+                    right: 0,
+                    width: '240px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                    zIndex: 100,
+                    padding: '0.5rem 0',
+                  }}
+                >
+                  <div style={{ padding: '0.375rem 0.75rem', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                    Export Options
+                  </div>
+                  <button
+                    className="dropdown-item"
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '0.5rem 0.75rem',
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--accent-primary)',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      fontSize: '0.825rem',
+                    }}
+                    onClick={() => handleExportCSV('')}
+                  >
+                    📦 Combined List (All Platforms)
+                  </button>
+                  <div style={{ height: '1px', background: 'var(--border-subtle)', margin: '0.375rem 0' }} />
+                  <div style={{ padding: '0.25rem 0.75rem', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                    Platform Specific CSV
+                  </div>
+                  <button className="dropdown-item" style={dropdownBtnStyle} onClick={() => handleExportCSV('linkedin-jobs')}>
+                    💼 LinkedIn Jobs CSV
+                  </button>
+                  <button className="dropdown-item" style={dropdownBtnStyle} onClick={() => handleExportCSV('naukri-scraper')}>
+                    🇮🇳 Naukri Jobs CSV
+                  </button>
+                  <button className="dropdown-item" style={dropdownBtnStyle} onClick={() => handleExportCSV('indeed-scraper')}>
+                    🔍 Indeed Jobs CSV
+                  </button>
+                  <button className="dropdown-item" style={dropdownBtnStyle} onClick={() => handleExportCSV('glassdoor-scraper')}>
+                    🏢 Glassdoor Jobs CSV
+                  </button>
+                  <button className="dropdown-item" style={dropdownBtnStyle} onClick={() => handleExportCSV('remote-ok-scraper')}>
+                    🌍 Remote OK CSV
+                  </button>
+                  <button className="dropdown-item" style={dropdownBtnStyle} onClick={() => handleExportCSV('upwork-scraper')}>
+                    💻 Upwork Freelance CSV
+                  </button>
+                  <button className="dropdown-item" style={dropdownBtnStyle} onClick={() => handleExportCSV('google-jobs-scraper')}>
+                    🔎 Google Jobs CSV
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* View toggle */}
             <div style={{ display: 'flex', gap: '0.375rem', padding: '0.25rem', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
