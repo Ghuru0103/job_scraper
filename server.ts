@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { ApifyClient } from 'apify-client';
+import { executeNativeFreeScrape } from './src/scrapers/nativeScraper';
+
 
 
 dotenv.config({ path: path.join(__dirname, '.env.local') });
@@ -365,44 +367,36 @@ async function simulateScrape(run: any, actor: { avgResultCount: number; name: s
     }
   }
 
-  // Fallback / Demo Mode (No APIFY_TOKEN provided)
-  await new Promise((res) => setTimeout(res, 2000));
-
-  const sources: Record<string, { companies: string[]; locations: string[] }> = {
-    'linkedin-jobs': { companies: ['Google', 'Meta', 'Amazon', 'Apple', 'Microsoft'], locations: ['San Francisco, CA', 'New York, NY', 'Remote'] },
-    'indeed-scraper': { companies: ['Walmart', 'UnitedHealth', 'CVS Health', 'Apple'], locations: ['Chicago, IL', 'Houston, TX', 'Remote'] },
-    'naukri-scraper': { companies: ['TCS', 'Infosys', 'Wipro', 'Flipkart', 'Swiggy', 'Zomato', 'Reliance Jio'], locations: ['Chennai, India', 'Madurai, India', 'Bengaluru, India', 'Remote'] },
-    default: { companies: ['TechCorp', 'DataSoft', 'CloudBase', 'AILabs'], locations: ['Chennai, India', 'Madurai, India', 'Remote'] },
-  };
-
-  const src = sources[actor.name] || sources.default;
-  const jobTitles = ['Senior Software Engineer', 'Full Stack Developer', 'Data Scientist', 'DevOps Engineer', 'ML Engineer', 'Backend Engineer'];
-  const skillSets = [['Angular', 'Node.js', 'MongoDB'], ['React', 'TypeScript'], ['Go', 'Docker'], ['Java', 'Spring Boot', 'Kafka']];
-
-  const count = Math.min(actor.avgResultCount, 50);
-  const jobs = Array.from({ length: count }, (_, i) => {
-    const title = jobTitles[i % jobTitles.length];
-    const company = src.companies[i % src.companies.length];
-    return {
-      runId: run._id,
-      userId: run.userId,
-      source: actor.name,
-      title,
-      company,
-      location: src.locations[i % src.locations.length],
-      remote: src.locations[i % src.locations.length] === 'Remote',
-      salary: { min: 80000 + Math.floor(Math.random() * 80000), max: 120000 + Math.floor(Math.random() * 100000), currency: actor.name === 'naukri-scraper' ? 'INR' : 'USD', period: 'yearly' },
-      experienceLevel: (['entry', 'mid', 'senior', 'lead'] as const)[i % 4],
-      jobType: 'full-time',
-      skills: skillSets[i % skillSets.length],
-      url: generateRealPlatformUrl(actor.name, title, company),
-      scrapedAt: new Date(),
-      postedAt: new Date(Date.now() - Math.random() * 7 * 86400000),
-    };
+  // Standalone Native Free Scraper (DOM & Free Endpoints - No 3rd party paid dependency)
+  const scrapedJobs = await executeNativeFreeScrape(actor.actorId || actor.name, {
+    searchQuery: run.input?.searchQuery as string,
+    location: run.input?.location as string,
+    experience: run.input?.experience as string,
+    maxResults: 30,
   });
 
-  await Job.insertMany(jobs);
-  jobsScraped.labels(actor.name).inc(count);
+  const jobsToInsert = scrapedJobs.map((j) => ({
+    runId: run._id,
+    userId: run.userId,
+    source: actor.name,
+    title: j.title,
+    company: j.company,
+    location: j.location,
+    remote: j.remote,
+    salary: j.salary,
+    experienceLevel: j.experienceLevel,
+    jobType: j.jobType,
+    skills: j.skills,
+    url: j.url,
+    scrapedAt: new Date(),
+    postedAt: new Date(j.postedAt),
+  }));
+
+  if (jobsToInsert.length > 0) {
+    await Job.insertMany(jobsToInsert);
+  }
+
+  jobsScraped.labels(actor.name).inc(jobsToInsert.length);
 
   const finishedAt = new Date();
   const startedAt = run.stats?.startedAt || new Date();
@@ -410,16 +404,17 @@ async function simulateScrape(run: any, actor: { avgResultCount: number; name: s
     status: 'succeeded',
     'stats.finishedAt': finishedAt,
     'stats.durationMs': finishedAt.getTime() - startedAt.getTime(),
-    'stats.requestsTotal': count * 2,
-    'output.resultsCount': count,
-    'output.previewResults': jobs.slice(0, 5),
-    $push: { logs: { level: 'info', message: `✅ Scraped ${count} jobs successfully`, timestamp: new Date() } },
+    'stats.requestsTotal': jobsToInsert.length * 2,
+    'output.resultsCount': jobsToInsert.length,
+    'output.previewResults': jobsToInsert.slice(0, 5),
+    $push: { logs: { level: 'info', message: `✅ Free Native DOM Scraped ${jobsToInsert.length} jobs successfully`, timestamp: new Date() } },
   });
 
   activeScraperJobs.dec();
   scraperJobsTotal.labels(actor.name, 'succeeded').inc();
   await cacheDelPattern('jobs:*');
 }
+
 
 
 
