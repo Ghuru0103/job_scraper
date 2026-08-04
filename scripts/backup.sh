@@ -1,13 +1,13 @@
 #!/bin/bash
 # ==============================================
-# Antigravity Backup Script
+# GS Backup Script
 # Backs up MongoDB to S3 with 30-day retention
 # ==============================================
 
 set -euo pipefail
 
 MONGODB_URI="${MONGODB_URI:-mongodb://admin:password@localhost:27017}"
-S3_BUCKET="${AWS_S3_BUCKET:-antigravity-backups}"
+S3_BUCKET="${AWS_S3_BUCKET:-GS-backups}"
 BACKUP_DIR="/backups/mongo"
 DATE=$(date +%Y%m%d-%H%M%S)
 BACKUP_PATH="${BACKUP_DIR}/backup-${DATE}"
@@ -56,4 +56,4 @@ aws s3 ls "s3://${S3_BUCKET}/mongo/" | \
 echo "✨ Backup complete!"
 
 # Cron setup:
-# 0 2 * * * /app/scripts/backup.sh >> /var/log/antigravity/backup.log 2>&1
+# 0 2 * * * /app/scripts/backup.sh >> /var/log/GS/backup.log 2>&1

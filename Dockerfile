@@ -1,5 +1,5 @@
 # ================================
-# Antigravity Apify Store
+# GS Apify Store
 # Multi-stage Production Dockerfile
 # ================================
 
@@ -35,7 +35,7 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Create log directory
-RUN mkdir -p /var/log/antigravity && chown nextjs:nodejs /var/log/antigravity
+RUN mkdir -p /var/log/GS && chown nextjs:nodejs /var/log/GS
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

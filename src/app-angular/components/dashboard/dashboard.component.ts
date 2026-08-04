@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
@@ -55,7 +55,7 @@ import { CommonModule } from '@angular/common';
 export class DashboardComponent implements OnInit {
   stats: any = null;
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   ngOnInit() {
     this.http.get('/api/stats').subscribe({

@@ -1,7 +1,7 @@
 import { Registry, Counter, Histogram, Gauge, collectDefaultMetrics } from 'prom-client';
 
 const register = new Registry();
-register.setDefaultLabels({ app: 'antigravity-store' });
+register.setDefaultLabels({ app: 'GS-store' });
 
 collectDefaultMetrics({ register });
 

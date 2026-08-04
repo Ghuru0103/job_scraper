@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================
-# Antigravity Apify Store — Single Command Startup
+# GS Apify Store — Single Command Startup
 # Usage: ./start.sh
 # =============================================================
 
@@ -13,10 +13,10 @@ YELLOW="\033[1;33m"
 RED="\033[0;31m"
 RESET="\033[0m"
 
-log()   { echo -e "${CYAN}[antigravity]${RESET} $1"; }
-ok()    { echo -e "${GREEN}[antigravity] ✓ $1${RESET}"; }
-warn()  { echo -e "${YELLOW}[antigravity] ⚠ $1${RESET}"; }
-error() { echo -e "${RED}[antigravity] ✗ $1${RESET}"; exit 1; }
+log()   { echo -e "${CYAN}[GS]${RESET} $1"; }
+ok()    { echo -e "${GREEN}[GS] ✓ $1${RESET}"; }
+warn()  { echo -e "${YELLOW}[GS] ⚠ $1${RESET}"; }
+error() { echo -e "${RED}[GS] ✗ $1${RESET}"; exit 1; }
 header(){ echo -e "\n${BOLD}${CYAN}══════════════════════════════════════${RESET}"; echo -e "${BOLD}${CYAN}  $1${RESET}"; echo -e "${BOLD}${CYAN}══════════════════════════════════════${RESET}\n"; }
 
 # ─── Trap: clean up on Ctrl+C ──────────────────────────────────────────────
@@ -31,7 +31,7 @@ cleanup() {
 trap cleanup INT TERM
 
 # ─── 1. Pre-flight checks ───────────────────────────────────────────────────
-header "⚗️  Antigravity Apify Store"
+header "⚗️  GS Apify Store"
 
 command -v docker &>/dev/null || error "Docker is not installed. Install from https://docs.docker.com/get-docker/"
 command -v node   &>/dev/null || error "Node.js is not installed."
@@ -62,7 +62,7 @@ if [ ! -f ".env.local" ]; then
   sed -i "s|your_encryption_key_change_me_in_production|${ENCRYPTION_KEY}|" .env.local
 
   # Point to local Docker containers
-  sed -i "s|MONGODB_URI=mongodb://localhost:27017/antigravity|MONGODB_URI=mongodb://localhost:27017/antigravity|" .env.local
+  sed -i "s|MONGODB_URI=mongodb://localhost:27017/GS|MONGODB_URI=mongodb://localhost:27017/GS|" .env.local
   sed -i "s|REDIS_URL=redis://localhost:6379|REDIS_URL=redis://localhost:6379|" .env.local
 
   ok ".env.local created with auto-generated secrets"
@@ -80,7 +80,7 @@ else
   docker run -d \
     --name ag-mongo \
     -p 27017:27017 \
-    -e MONGO_INITDB_DATABASE=antigravity \
+    -e MONGO_INITDB_DATABASE=GS \
     -v ag-mongo-data:/data/db \
     mongo:6.0 \
     --quiet \
@@ -115,7 +115,7 @@ until docker exec ag-mongo mongosh --quiet --eval "db.runCommand('ping').ok" 2>/
   if [ $COUNT -ge $MAX_WAIT ]; then
     error "MongoDB did not become ready within ${MAX_WAIT}s"
   fi
-  echo -ne "${CYAN}[antigravity]${RESET} Waiting for MongoDB... (${COUNT}s)\r"
+  echo -ne "${CYAN}[GS]${RESET} Waiting for MongoDB... (${COUNT}s)\r"
 done
 ok "MongoDB is ready"
 

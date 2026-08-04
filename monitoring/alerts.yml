@@ -1,5 +1,5 @@
 groups:
-  - name: antigravity
+  - name: GS
     rules:
       # ================================
       # HTTP Alerts

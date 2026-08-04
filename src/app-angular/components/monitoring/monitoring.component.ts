@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
@@ -69,7 +69,7 @@ export class MonitoringComponent implements OnInit {
   health: any = null;
   rawMetrics = 'Loading metrics stream...';
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   ngOnInit() {
     this.http.get('/api/health').subscribe({

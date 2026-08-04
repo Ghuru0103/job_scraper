@@ -8,7 +8,7 @@ esbuild.build({
   minify: false,
   sourcemap: true,
   target: ['es2022'],
-  format: 'esm',
+  format: 'iife',
   loader: { '.ts': 'ts' },
   define: { 'process.env.NODE_ENV': '"production"' },
   tsconfigRaw: JSON.stringify({

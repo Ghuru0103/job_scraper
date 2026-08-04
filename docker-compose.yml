@@ -8,27 +8,27 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: antigravity-app:latest
+    image: GS-app:latest
     restart: unless-stopped
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongo-1:27017,mongo-2:27017,mongo-3:27017/antigravity?replicaSet=rs0&retryWrites=true&w=majority
+      - MONGODB_URI=mongodb://admin:${MONGO_PASSWORD:-password}@mongo-1:27017,mongo-2:27017,mongo-3:27017/GS?replicaSet=rs0&retryWrites=true&w=majority
       - REDIS_URL=redis://:${REDIS_PASSWORD:-password}@redis:6379
       - JWT_SECRET=${JWT_SECRET}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - LOG_LEVEL=info
       - LOG_TO_FILE=true
-      - LOG_FILE_PATH=/var/log/antigravity/app.log
+      - LOG_FILE_PATH=/var/log/GS/app.log
     volumes:
-      - logs:/var/log/antigravity
+      - logs:/var/log/GS
     depends_on:
       mongo-1:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
-      - antigravity-net
+      - GS-net
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: 30s
@@ -65,7 +65,7 @@ services:
     depends_on:
       - app
     networks:
-      - antigravity-net
+      - GS-net
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s
@@ -80,13 +80,13 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password}
-      MONGO_INITDB_DATABASE: antigravity
+      MONGO_INITDB_DATABASE: GS
     volumes:
       - mongo-1-data:/data/db
       - ./mongo/keyfile:/etc/mongo/keyfile:ro
       - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
     networks:
-      - antigravity-net
+      - GS-net
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh --quiet
       interval: 10s
@@ -102,7 +102,7 @@ services:
       - mongo-2-data:/data/db
       - ./mongo/keyfile:/etc/mongo/keyfile:ro
     networks:
-      - antigravity-net
+      - GS-net
 
   mongo-3:
     image: mongo:6.0
@@ -112,7 +112,7 @@ services:
       - mongo-3-data:/data/db
       - ./mongo/keyfile:/etc/mongo/keyfile:ro
     networks:
-      - antigravity-net
+      - GS-net
 
   # MongoDB replica set initializer
   mongo-init:
@@ -134,7 +134,7 @@ services:
       - mongo-2
       - mongo-3
     networks:
-      - antigravity-net
+      - GS-net
 
   # ================================
   # Redis (primary + sentinel)
@@ -146,7 +146,7 @@ services:
     volumes:
       - redis-data:/data
     networks:
-      - antigravity-net
+      - GS-net
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-password}", "ping"]
       interval: 10s
@@ -170,7 +170,7 @@ services:
       - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
       - prometheus-data:/prometheus
     networks:
-      - antigravity-net
+      - GS-net
 
   # ================================
   # Grafana Dashboards
@@ -192,7 +192,7 @@ services:
     depends_on:
       - prometheus
     networks:
-      - antigravity-net
+      - GS-net
 
 # ================================
 # Volumes
@@ -211,7 +211,7 @@ volumes:
 # Networks
 # ================================
 networks:
-  antigravity-net:
+  GS-net:
     driver: bridge
     ipam:
       config:
