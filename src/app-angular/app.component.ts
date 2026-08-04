@@ -8,18 +8,21 @@ import { CommonModule } from '@angular/common';
   imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
   template: `
     <nav class="navbar" style="position: sticky; top: 0; z-index: 50; background: var(--glass-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);">
-      <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.5rem; height: 64px;">
+      <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; height: 68px;">
         <!-- Brand Logo -->
-        <a routerLink="/" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
-          <div style="width: 36px; height: 36px; border-radius: 10px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: var(--shadow-glow);">
-            ⚡
-          </div>
+        <a routerLink="/" style="display: flex; align-items: center; gap: 0.875rem; text-decoration: none;">
+          <img
+            src="/assets/company_logo.png"
+            alt="GS Store Logo"
+            style="height: 40px; width: auto; object-fit: contain; border-radius: var(--radius-sm);"
+            onerror="this.style.display='none'"
+          />
           <div>
-            <span style="font-size: 1.125rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em;">
+            <span style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em;">
               GS Store
             </span>
             <span class="badge badge-purple" style="margin-left: 0.5rem; font-size: 0.65rem; padding: 0.15rem 0.4rem;">
-              Job Scraper
+              Job Scraper Engine
             </span>
           </div>
         </a>

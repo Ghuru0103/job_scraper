@@ -32,10 +32,19 @@ interface Actor {
   imports: [CommonModule, FormsModule],
   template: `
     <div style="min-height: 100vh;">
-      <!-- Hero -->
+      <!-- Hero Section -->
       <section class="grid-bg" style="padding: 3.5rem 0 2.5rem; text-align: center; position: relative;">
         <div class="container">
-          <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 1rem; border-radius: var(--radius-full); background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); font-size: 0.8rem; color: #a5b4fc; font-weight: 600; margin-bottom: 1.25rem;">
+          <!-- Company Logo Header -->
+          <div style="margin-bottom: 1.25rem;">
+            <img
+              src="/assets/company_logo.png"
+              alt="GS Store Company Logo"
+              style="max-height: 72px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(99,102,241,0.25));"
+            />
+          </div>
+
+          <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 1rem; border-radius: var(--radius-full); background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); font-size: 0.8rem; color: #a5b4fc; font-weight: 600; margin-bottom: 1rem;">
             <span>🕷️</span> Self-Contained Native Scraper Engine
           </div>
 
@@ -50,7 +59,7 @@ interface Actor {
       </section>
 
       <!-- Category Filter Bar -->
-      <div style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-secondary); position: sticky; top: 64px; z-index: 40;">
+      <div style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-secondary); position: sticky; top: 68px; z-index: 40;">
         <div class="container" style="padding: 1rem 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
           <div class="input-group" style="flex: 1; min-width: 200px; max-width: 320px;">
             <span class="input-icon">🔍</span>

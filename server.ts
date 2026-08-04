@@ -29,7 +29,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend files (Angular build output)
+// Serve static frontend files (Angular build output and assets)
+app.use('/assets', express.static(path.join(__dirname, 'src/assets')));
 app.use(express.static(path.join(__dirname, 'dist/public')));
 
 // Middleware for tracking HTTP metrics

@@ -75447,10 +75447,19 @@ This is currently a dev mode only error but will become a call stack size exceed
       imports: [CommonModule, FormsModule],
       template: `
     <div style="min-height: 100vh;">
-      <!-- Hero -->
+      <!-- Hero Section -->
       <section class="grid-bg" style="padding: 3.5rem 0 2.5rem; text-align: center; position: relative;">
         <div class="container">
-          <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 1rem; border-radius: var(--radius-full); background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); font-size: 0.8rem; color: #a5b4fc; font-weight: 600; margin-bottom: 1.25rem;">
+          <!-- Company Logo Header -->
+          <div style="margin-bottom: 1.25rem;">
+            <img
+              src="/assets/company_logo.png"
+              alt="GS Store Company Logo"
+              style="max-height: 72px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(99,102,241,0.25));"
+            />
+          </div>
+
+          <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 1rem; border-radius: var(--radius-full); background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); font-size: 0.8rem; color: #a5b4fc; font-weight: 600; margin-bottom: 1rem;">
             <span>\u{1F577}\uFE0F</span> Self-Contained Native Scraper Engine
           </div>
 
@@ -75465,7 +75474,7 @@ This is currently a dev mode only error but will become a call stack size exceed
       </section>
 
       <!-- Category Filter Bar -->
-      <div style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-secondary); position: sticky; top: 64px; z-index: 40;">
+      <div style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-secondary); position: sticky; top: 68px; z-index: 40;">
         <div class="container" style="padding: 1rem 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
           <div class="input-group" style="flex: 1; min-width: 200px; max-width: 320px;">
             <span class="input-icon">\u{1F50D}</span>
@@ -76134,18 +76143,21 @@ This is currently a dev mode only error but will become a call stack size exceed
       imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
       template: `
     <nav class="navbar" style="position: sticky; top: 0; z-index: 50; background: var(--glass-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);">
-      <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.5rem; height: 64px;">
+      <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; height: 68px;">
         <!-- Brand Logo -->
-        <a routerLink="/" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
-          <div style="width: 36px; height: 36px; border-radius: 10px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: var(--shadow-glow);">
-            \u26A1
-          </div>
+        <a routerLink="/" style="display: flex; align-items: center; gap: 0.875rem; text-decoration: none;">
+          <img
+            src="/assets/company_logo.png"
+            alt="GS Store Logo"
+            style="height: 40px; width: auto; object-fit: contain; border-radius: var(--radius-sm);"
+            onerror="this.style.display='none'"
+          />
           <div>
-            <span style="font-size: 1.125rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em;">
+            <span style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em;">
               GS Store
             </span>
             <span class="badge badge-purple" style="margin-left: 0.5rem; font-size: 0.65rem; padding: 0.15rem 0.4rem;">
-              Job Scraper
+              Job Scraper Engine
             </span>
           </div>
         </a>
