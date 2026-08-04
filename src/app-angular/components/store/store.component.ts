@@ -7,6 +7,7 @@ interface ActorInput {
   searchQuery: string;
   location: string;
   experience: string;
+  postedWithin: string;
   maxResults: number;
 }
 
@@ -89,7 +90,7 @@ interface Actor {
         </div>
 
         <div *ngIf="loading" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
-          <div *ngFor="let item of [1,2,3,4,5,6]" class="skeleton" style="height: 380px; border-radius: var(--radius-lg);"></div>
+          <div *ngFor="let item of [1,2,3,4,5,6]" class="skeleton" style="height: 420px; border-radius: var(--radius-lg);"></div>
         </div>
 
         <div *ngIf="!loading" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
@@ -158,7 +159,7 @@ interface Actor {
                     />
                   </div>
 
-                  <!-- Experience & Max Results Row -->
+                  <!-- Experience & Date Posted Row -->
                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                     <div>
                       <label style="font-size: 0.725rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.25rem;">
@@ -175,17 +176,35 @@ interface Actor {
 
                     <div>
                       <label style="font-size: 0.725rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.25rem;">
-                        🔢 Max Results:
+                        📅 Date Posted:
                       </label>
-                      <input
-                        type="number"
+                      <select
                         class="input"
-                        style="font-size: 0.8rem; padding: 0.4rem 0.6rem; width: 100%;"
-                        [(ngModel)]="actorInputs[actor.actorId].maxResults"
-                        min="1"
-                        max="100"
-                      />
+                        style="font-size: 0.8rem; padding: 0.4rem 0.6rem; width: 100%; cursor: pointer;"
+                        [(ngModel)]="actorInputs[actor.actorId].postedWithin"
+                      >
+                        <option value="24h">⚡ Past 1 day</option>
+                        <option value="3days">🕒 Past 3 days</option>
+                        <option value="1week">📅 Past week</option>
+                        <option value="1month">🗓️ Within last month</option>
+                        <option value="any">🌐 Any time</option>
+                      </select>
                     </div>
+                  </div>
+
+                  <!-- Max Results Row -->
+                  <div>
+                    <label style="font-size: 0.725rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.25rem;">
+                      🔢 Max Results:
+                    </label>
+                    <input
+                      type="number"
+                      class="input"
+                      style="font-size: 0.8rem; padding: 0.4rem 0.6rem; width: 100%;"
+                      [(ngModel)]="actorInputs[actor.actorId].maxResults"
+                      min="1"
+                      max="100"
+                    />
                   </div>
                 </div>
               </div>
@@ -253,6 +272,7 @@ export class StoreComponent implements OnInit {
         searchQuery: (def['searchQuery'] as string) || 'MEAN stack, Angular, Node.js, Java',
         location: (def['location'] as string) || 'Chennai, Madurai',
         experience: (def['experience'] as string) || '2 years',
+        postedWithin: (def['postedWithin'] as string) || '1week',
         maxResults: (def['maxResults'] as number) || 30,
       };
     }
@@ -282,7 +302,7 @@ export class StoreComponent implements OnInit {
       input: customInput,
     }).subscribe({
       next: (res) => {
-        this.successMessage = `Scraper "${actor.title}" started! Fetching up to ${customInput.maxResults || 30} jobs for query "${customInput.searchQuery}" in "${customInput.location}".`;
+        this.successMessage = `Scraper "${actor.title}" started! Fetching up to ${customInput.maxResults || 30} jobs for query "${customInput.searchQuery}" (${customInput.postedWithin || 'past week'}).`;
         setTimeout(() => {
           this.runningMap[actor.actorId] = false;
         }, 2000);

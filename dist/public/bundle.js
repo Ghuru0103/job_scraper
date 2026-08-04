@@ -75405,6 +75405,7 @@ This is currently a dev mode only error but will become a call stack size exceed
           searchQuery: def["searchQuery"] || "MEAN stack, Angular, Node.js, Java",
           location: def["location"] || "Chennai, Madurai",
           experience: def["experience"] || "2 years",
+          postedWithin: def["postedWithin"] || "1week",
           maxResults: def["maxResults"] || 30
         };
       }
@@ -75428,7 +75429,7 @@ This is currently a dev mode only error but will become a call stack size exceed
         input: customInput
       }).subscribe({
         next: (res) => {
-          this.successMessage = `Scraper "${actor.title}" started! Fetching up to ${customInput.maxResults || 30} jobs for query "${customInput.searchQuery}" in "${customInput.location}".`;
+          this.successMessage = `Scraper "${actor.title}" started! Fetching up to ${customInput.maxResults || 30} jobs for query "${customInput.searchQuery}" (${customInput.postedWithin || "past week"}).`;
           setTimeout(() => {
             this.runningMap[actor.actorId] = false;
           }, 2e3);
@@ -75504,7 +75505,7 @@ This is currently a dev mode only error but will become a call stack size exceed
         </div>
 
         <div *ngIf="loading" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
-          <div *ngFor="let item of [1,2,3,4,5,6]" class="skeleton" style="height: 380px; border-radius: var(--radius-lg);"></div>
+          <div *ngFor="let item of [1,2,3,4,5,6]" class="skeleton" style="height: 420px; border-radius: var(--radius-lg);"></div>
         </div>
 
         <div *ngIf="!loading" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
@@ -75573,7 +75574,7 @@ This is currently a dev mode only error but will become a call stack size exceed
                     />
                   </div>
 
-                  <!-- Experience & Max Results Row -->
+                  <!-- Experience & Date Posted Row -->
                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                     <div>
                       <label style="font-size: 0.725rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.25rem;">
@@ -75590,17 +75591,35 @@ This is currently a dev mode only error but will become a call stack size exceed
 
                     <div>
                       <label style="font-size: 0.725rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.25rem;">
-                        \u{1F522} Max Results:
+                        \u{1F4C5} Date Posted:
                       </label>
-                      <input
-                        type="number"
+                      <select
                         class="input"
-                        style="font-size: 0.8rem; padding: 0.4rem 0.6rem; width: 100%;"
-                        [(ngModel)]="actorInputs[actor.actorId].maxResults"
-                        min="1"
-                        max="100"
-                      />
+                        style="font-size: 0.8rem; padding: 0.4rem 0.6rem; width: 100%; cursor: pointer;"
+                        [(ngModel)]="actorInputs[actor.actorId].postedWithin"
+                      >
+                        <option value="24h">\u26A1 Past 1 day</option>
+                        <option value="3days">\u{1F552} Past 3 days</option>
+                        <option value="1week">\u{1F4C5} Past week</option>
+                        <option value="1month">\u{1F5D3}\uFE0F Within last month</option>
+                        <option value="any">\u{1F310} Any time</option>
+                      </select>
                     </div>
+                  </div>
+
+                  <!-- Max Results Row -->
+                  <div>
+                    <label style="font-size: 0.725rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.25rem;">
+                      \u{1F522} Max Results:
+                    </label>
+                    <input
+                      type="number"
+                      class="input"
+                      style="font-size: 0.8rem; padding: 0.4rem 0.6rem; width: 100%;"
+                      [(ngModel)]="actorInputs[actor.actorId].maxResults"
+                      min="1"
+                      max="100"
+                    />
                   </div>
                 </div>
               </div>
@@ -75933,7 +75952,7 @@ This is currently a dev mode only error but will become a call stack size exceed
 
               <div style="display: flex; gap: 0.5rem; align-items: center;">
                 <a [href]="'/jobs?runId=' + run._id" class="btn btn-primary btn-sm" style="text-decoration: none;">
-                  \u{1F4BC} View Results ({{ run.output?.resultsCount || 0 }})
+                  \u{1F4BC} View Results 
                 </a>
                 <button class="btn btn-secondary btn-sm" (click)="toggleDetails(run._id)">
                   \u{1F441} Details

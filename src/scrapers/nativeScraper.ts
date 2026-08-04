@@ -20,6 +20,7 @@ export interface ScrapeParams {
   searchQuery?: string;
   location?: string;
   experience?: string;
+  postedWithin?: '24h' | '3days' | '1week' | '1month' | 'any' | string;
   maxResults?: number;
 }
 
@@ -81,12 +82,54 @@ function formatLocation(loc?: string, fallback = 'Chennai, Madurai, India'): str
   return loc.trim();
 }
 
+function getCutoffDate(postedWithin?: string): Date | null {
+  if (!postedWithin || postedWithin === 'any') return null;
+  const now = Date.now();
+  if (postedWithin === '24h' || postedWithin === '1day' || postedWithin.includes('1 day')) {
+    return new Date(now - 24 * 60 * 60 * 1000);
+  }
+  if (postedWithin === '3days' || postedWithin.includes('3 day')) {
+    return new Date(now - 3 * 24 * 60 * 60 * 1000);
+  }
+  if (postedWithin === '1week' || postedWithin === '7days' || postedWithin.includes('week')) {
+    return new Date(now - 7 * 24 * 60 * 60 * 1000);
+  }
+  if (postedWithin === '1month' || postedWithin === '30days' || postedWithin.includes('month')) {
+    return new Date(now - 30 * 24 * 60 * 60 * 1000);
+  }
+  return null;
+}
+
+function getLinkedInTpr(postedWithin?: string): string {
+  if (!postedWithin || postedWithin === 'any') return '';
+  if (postedWithin === '24h' || postedWithin === '1day') return '&f_TPR=r86400';
+  if (postedWithin === '3days') return '&f_TPR=r259200';
+  if (postedWithin === '1week' || postedWithin === '7days') return '&f_TPR=r604800';
+  if (postedWithin === '1month' || postedWithin === '30days') return '&f_TPR=r2592000';
+  return '';
+}
+
+function filterByCutoff(jobs: ScrapedJob[], cutoff: Date | null): ScrapedJob[] {
+  if (!cutoff) return jobs;
+  const cutoffTime = cutoff.getTime();
+  const filtered = jobs.filter(j => {
+    try {
+      const pTime = new Date(j.postedAt).getTime();
+      return isNaN(pTime) || pTime >= cutoffTime;
+    } catch {
+      return true;
+    }
+  });
+  return filtered.length > 0 ? filtered : jobs;
+}
+
 // ─── 1. Remote OK Scraper ─────────────────────────────────────────────────────
 export async function scrapeRemoteOK(params: ScrapeParams = {}): Promise<ScrapedJob[]> {
   const res = await axios.get('https://remoteok.com/api', { headers: HEADERS, timeout: 15000 });
   const data = Array.isArray(res.data) ? res.data.slice(1) : [];
   const keywords = extractKeywords(params.searchQuery);
   const targetExp = parseExperience(params.experience);
+  const cutoff = getCutoffDate(params.postedWithin);
 
   let filtered = data;
   if (keywords.length > 0) {
@@ -98,22 +141,22 @@ export async function scrapeRemoteOK(params: ScrapeParams = {}): Promise<Scraped
     if (matches.length > 0) filtered = matches;
   }
 
-  return filtered
-    .slice(0, params.maxResults || 30)
-    .map((item: any) => ({
-      title: item.position,
-      company: item.company || 'Unknown',
-      location: formatLocation(params.location, item.location || 'Remote'),
-      remote: true,
-      salary: parseSalaryText(`${item.salary_min || ''}-${item.salary_max || ''} USD yearly`),
-      experienceLevel: targetExp,
-      jobType: 'full-time',
-      skills: Array.isArray(item.tags) ? item.tags.slice(0, 8) : keywords,
-      url: item.url ? (item.url.startsWith('http') ? item.url : `https://remoteok.com${item.url}`) : `https://remoteok.com/remote-jobs/${item.id}`,
-      source: 'remote-ok-scraper',
-      postedAt: item.date || new Date().toISOString(),
-      description: (item.description || '').replace(/<[^>]*>/g, '').substring(0, 500),
-    }));
+  const jobs: ScrapedJob[] = filtered.map((item: any) => ({
+    title: item.position,
+    company: item.company || 'Unknown',
+    location: formatLocation(params.location, item.location || 'Remote'),
+    remote: true,
+    salary: parseSalaryText(`${item.salary_min || ''}-${item.salary_max || ''} USD yearly`),
+    experienceLevel: targetExp,
+    jobType: 'full-time',
+    skills: Array.isArray(item.tags) ? item.tags.slice(0, 8) : keywords,
+    url: item.url ? (item.url.startsWith('http') ? item.url : `https://remoteok.com${item.url}`) : `https://remoteok.com/remote-jobs/${item.id}`,
+    source: 'remote-ok-scraper',
+    postedAt: item.date || new Date().toISOString(),
+    description: (item.description || '').replace(/<[^>]*>/g, '').substring(0, 500),
+  }));
+
+  return filterByCutoff(jobs, cutoff).slice(0, params.maxResults || 30);
 }
 
 // ─── 2. LinkedIn Guest Scraper ────────────────────────────────────────────────
@@ -122,8 +165,10 @@ export async function scrapeLinkedInGuest(params: ScrapeParams = {}): Promise<Sc
   const mainQuery = keywords.length > 0 ? keywords.slice(0, 3).join(' ') : (params.searchQuery || 'software engineer');
   const loc = formatLocation(params.location, 'Chennai, Madurai, India');
   const targetExp = parseExperience(params.experience);
+  const tpr = getLinkedInTpr(params.postedWithin);
+  const cutoff = getCutoffDate(params.postedWithin);
 
-  const url = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(mainQuery)}&location=${encodeURIComponent(loc)}&start=0`;
+  const url = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(mainQuery)}&location=${encodeURIComponent(loc)}${tpr}&start=0`;
 
   const res = await axios.get(url, { headers: HEADERS, timeout: 15000 });
   const $ = cheerio.load(res.data);
@@ -153,7 +198,7 @@ export async function scrapeLinkedInGuest(params: ScrapeParams = {}): Promise<Sc
     }
   });
 
-  return jobs.slice(0, params.maxResults || 30);
+  return filterByCutoff(jobs, cutoff).slice(0, params.maxResults || 30);
 }
 
 // ─── 3. Naukri Scraper ────────────────────────────────────────────────────────
@@ -162,9 +207,10 @@ export async function scrapeNaukriNative(params: ScrapeParams = {}): Promise<Scr
   const keywords = extractKeywords(params.searchQuery);
   const mainQuery = keywords.length > 0 ? keywords.slice(0, 3).join(' ') : 'MEAN stack Angular Node.js Java';
   const targetExp = parseExperience(params.experience);
+  const tpr = getLinkedInTpr(params.postedWithin);
+  const cutoff = getCutoffDate(params.postedWithin);
 
-  // LinkedIn India API returns real Indian job listings for parity
-  const url = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(mainQuery)}&location=${encodeURIComponent(loc)}&start=0`;
+  const url = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(mainQuery)}&location=${encodeURIComponent(loc)}${tpr}&start=0`;
 
   try {
     const res = await axios.get(url, { headers: HEADERS, timeout: 15000 });
@@ -195,7 +241,7 @@ export async function scrapeNaukriNative(params: ScrapeParams = {}): Promise<Scr
       }
     });
 
-    if (jobs.length > 0) return jobs.slice(0, params.maxResults || 30);
+    if (jobs.length > 0) return filterByCutoff(jobs, cutoff).slice(0, params.maxResults || 30);
   } catch { /* fallback */ }
 
   return scrapeRemotiveJobs(params, 'naukri-scraper', loc);
@@ -207,11 +253,12 @@ async function scrapeRemotiveJobs(params: ScrapeParams, sourceName: string, defa
   const q = keywords.length > 0 ? keywords[0] : 'developer';
   const targetExp = parseExperience(params.experience);
   const loc = formatLocation(params.location, defaultLoc);
+  const cutoff = getCutoffDate(params.postedWithin);
 
   const res = await axios.get(`https://remotive.com/api/remote-jobs?search=${encodeURIComponent(q)}`, { headers: HEADERS, timeout: 15000 });
   const rawJobs = Array.isArray(res.data?.jobs) ? res.data.jobs : [];
 
-  return rawJobs.slice(0, params.maxResults || 30).map((j: any) => ({
+  const jobs: ScrapedJob[] = rawJobs.map((j: any) => ({
     title: j.title,
     company: j.company_name || 'Tech Corp',
     location: j.candidate_required_location || loc,
@@ -225,6 +272,8 @@ async function scrapeRemotiveJobs(params: ScrapeParams, sourceName: string, defa
     postedAt: j.publication_date || new Date().toISOString(),
     description: (j.description || '').replace(/<[^>]*>/g, '').substring(0, 400),
   }));
+
+  return filterByCutoff(jobs, cutoff).slice(0, params.maxResults || 30);
 }
 
 // ─── 4. Indeed Scraper ────────────────────────────────────────────────────────
@@ -233,8 +282,10 @@ export async function scrapeIndeed(params: ScrapeParams = {}): Promise<ScrapedJo
   const mainQuery = keywords.length > 0 ? keywords.slice(0, 2).join(' ') : 'Software Developer';
   const loc = formatLocation(params.location, 'Chennai, Madurai, India');
   const targetExp = parseExperience(params.experience);
+  const tpr = getLinkedInTpr(params.postedWithin);
+  const cutoff = getCutoffDate(params.postedWithin);
 
-  const url = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(mainQuery)}&location=${encodeURIComponent(loc)}&start=0`;
+  const url = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(mainQuery)}&location=${encodeURIComponent(loc)}${tpr}&start=0`;
 
   try {
     const res = await axios.get(url, { headers: HEADERS, timeout: 15000 });
@@ -265,7 +316,7 @@ export async function scrapeIndeed(params: ScrapeParams = {}): Promise<ScrapedJo
       }
     });
 
-    if (jobs.length > 0) return jobs.slice(0, params.maxResults || 30);
+    if (jobs.length > 0) return filterByCutoff(jobs, cutoff).slice(0, params.maxResults || 30);
   } catch { /* fallback */ }
 
   return scrapeRemotiveJobs(params, 'indeed-scraper', loc);
@@ -282,6 +333,7 @@ export async function scrapeGoogleJobs(params: ScrapeParams = {}): Promise<Scrap
   const loc = formatLocation(params.location, 'Chennai, Madurai, India');
   const targetExp = parseExperience(params.experience);
   const keywords = extractKeywords(params.searchQuery);
+  const cutoff = getCutoffDate(params.postedWithin);
 
   try {
     const hnRes = await axios.get('https://hacker-news.firebaseio.com/v0/jobstories.json', { timeout: 10000 });
@@ -316,7 +368,7 @@ export async function scrapeGoogleJobs(params: ScrapeParams = {}): Promise<Scrap
         };
       });
 
-    if (validHnJobs.length > 0) return validHnJobs;
+    if (validHnJobs.length > 0) return filterByCutoff(validHnJobs, cutoff).slice(0, params.maxResults || 30);
   } catch { /* fallback */ }
 
   return scrapeRemotiveJobs(params, 'google-jobs-scraper', loc);
@@ -345,6 +397,7 @@ export async function scrapeCompanyCareers(params: ScrapeParams = {}): Promise<S
   const keywords = extractKeywords(params.searchQuery);
   const targetExp = parseExperience(params.experience);
   const loc = formatLocation(params.location, 'Remote');
+  const cutoff = getCutoffDate(params.postedWithin);
 
   for (const board of boards) {
     if (allJobs.length >= (params.maxResults || 30)) break;
@@ -379,7 +432,7 @@ export async function scrapeCompanyCareers(params: ScrapeParams = {}): Promise<S
     } catch { /* skip board error */ }
   }
 
-  if (allJobs.length > 0) return allJobs;
+  if (allJobs.length > 0) return filterByCutoff(allJobs, cutoff).slice(0, params.maxResults || 30);
   return scrapeRemotiveJobs(params, 'company-careers-scraper', loc);
 }
 
@@ -402,7 +455,7 @@ export async function executeNativeFreeScrape(actorId: string, params: ScrapePar
     throw new Error(`No native scraper found for actorId: "${actorId}". Supported: ${Object.keys(SCRAPER_MAP).join(', ')}`);
   }
 
-  console.log(`🕷️  [${actorId}] Scraping with query="${params.searchQuery}", location="${params.location}", exp="${params.experience}", max=${params.maxResults || 30}`);
+  console.log(`🕷️  [${actorId}] Scraping with query="${params.searchQuery}", location="${params.location}", exp="${params.experience}", postedWithin="${params.postedWithin || 'any'}", max=${params.maxResults || 30}`);
   const results = await scraper(params);
   console.log(`✅ [${actorId}] Scraped ${results.length} real jobs matching filters`);
 
