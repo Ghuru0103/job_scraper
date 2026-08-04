@@ -53,7 +53,7 @@ interface Run {
 
               <div style="display: flex; gap: 0.5rem; align-items: center;">
                 <a [href]="'/jobs?runId=' + run._id" class="btn btn-primary btn-sm" style="text-decoration: none;">
-                  💼 View Results ({{ run.output?.resultsCount || 0 }})
+                  💼 View Results 
                 </a>
                 <button class="btn btn-secondary btn-sm" (click)="toggleDetails(run._id)">
                   👁 Details
